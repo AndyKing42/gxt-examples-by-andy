@@ -5,7 +5,7 @@ package org.greatlogic.gxtexamples.client.glgwt;
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
  * 
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
@@ -36,8 +36,9 @@ public static StringBuilder appendCSVValue(final StringBuilder sb, final Object 
   }
   String stringValue = value == null ? "" : value.toString();
   if (stringValue.indexOf(delimiter) >= 0) {
-    stringValue = delimiter + stringValue.replace("" + delimiter, "" + delimiter + delimiter) +
-                  delimiter;
+    stringValue =
+                  delimiter + stringValue.replace("" + delimiter, "" + delimiter + delimiter) +
+                          delimiter;
   }
   else if (stringValue.indexOf(separator) >= 0 ||
            (!stringValue.isEmpty() && (stringValue.charAt(0) == ' ' || stringValue.charAt(stringValue.length() - 1) == ' '))) {
