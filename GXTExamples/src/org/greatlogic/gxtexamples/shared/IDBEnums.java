@@ -10,9 +10,14 @@ Person
 }
 //--------------------------------------------------------------------------------------------------
 enum Person implements IGLColumn {
+CurrentOrgId,
+DisplayName,
+EmailAddress,
 FirstName,
 LastName,
-PersonID
+LoginName,
+PersonID,
+Version
 }
 //--------------------------------------------------------------------------------------------------
 }

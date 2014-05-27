@@ -19,15 +19,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import com.google.common.collect.Maps;
-import com.greatlogic.glbase.gldb.IGLColumn;
-import com.greatlogic.glbase.glxml.IGLXMLAttributeEnum;
 /**
  * Instances of this class represent a map of keys to values. The benefit of using this class over
- * the {@link Properties} or a simple {@link Map} object are that the values can be accessed using
- * {@link IGLColumn} and {@link IGLXMLAttributeEnum} enum entries, in addition to using simple
- * String keys. Additionally, the values can be retrieved and stored using simple data types, and
- * values can be retrieved using a different data type than the data type of the original value, and
- * the returned value will be automatically converted (with a best guess attempt in some cases).
+ * the Properties or a simple {@link Map} object are that the values can be accessed using
+ * {@link IGLColumn} enum entries, in addition to using simple String keys. Additionally, the values
+ * can be retrieved and stored using simple data types, and values can be retrieved using a
+ * different data type than the data type of the original value, and the returned value will be
+ * automatically converted (with a best guess attempt in some cases).
  */
 public class GLValueMap implements Cloneable {
 //--------------------------------------------------------------------------------------------------
@@ -250,6 +248,10 @@ public Set<String> keySet() {
 //--------------------------------------------------------------------------------------------------
 public Object put(final String key, final Object value) {
   return _valueMap.put(getAdjustedKey(key), value);
+}
+//--------------------------------------------------------------------------------------------------
+public Object put(final IGLColumn column, final Object value) {
+  return _valueMap.put(column.toString(), value);
 }
 //--------------------------------------------------------------------------------------------------
 public void putAll(final Map<String, ? extends Object> map) {
