@@ -18,12 +18,12 @@ public void log(final int logLevelId, final String location, final String messag
 } // log()
 //--------------------------------------------------------------------------------------------------
 /**
-* Attempts to log in using the supplied login name and password.
-* @param loginName The login name that will be used for the login attempt.
-* @param password The password that will be used for the login attempt (this is the plain text
-* password, not the encrypted hash value).
-* @return The id of the Person row, or zero if the login request fails.
-*/
+ * Attempts to log in using the supplied login name and password.
+ * @param loginName The login name that will be used for the login attempt.
+ * @param password The password that will be used for the login attempt (this is the plain text
+ * password, not the encrypted hash value).
+ * @return The id of the Person row, or zero if the login request fails.
+ */
 @Override
 public Integer login(final String loginName, final String password) {
   // find the user using the loginName and password
@@ -70,68 +70,4 @@ public String select(final String xmlRequest) {
   return result.toString();
 }
 //--------------------------------------------------------------------------------------------------
-//
-//private static final StringBuilder _tempSB = new StringBuilder(500);
-//
-////--------------------------------------------------------------------------------------------------
-//@Override
-//public String sql(final GLGWTSQL gwtSQL) {
-//  String result;
-//  GLLog.debug("" + gwtSQL);
-//  synchronized (_tempSB) {
-//    _tempSB.setLength(0);
-//    GLSQL sql;
-//    try {
-//      sql = FAPUtil.convertToSQL(gwtSQL);
-//      sql.open();
-//      try {
-//        _tempSB.append(sql.getColumnNameIterable());
-//        while (sql.next()) {
-//          _tempSB.append(GLGWTUtil.RecordSeparator);
-//          ForeignKeys.resolveReferencesToShortDesc(sql);
-//          sql.getRowAsCSV(_tempSB);
-//        }
-//      }
-//      finally {
-//        sql.close();
-//      }
-//    }
-//    catch (final GLDBException dbe) {
-//    }
-//    result = _tempSB.toString();
-//  }
-//  return result;
-//} // sql()
-//--------------------------------------------------------------------------------------------------
-//@Override
-//public String greetServer(final String input) throws IllegalArgumentException {
-//  // Verify that the input is valid. 
-//  if (!FieldVerifier.isValidName(input)) {
-//    // If the input is not valid, throw an IllegalArgumentException back to
-//    // the client.
-//    throw new IllegalArgumentException("Name must be at least 4 characters long");
-//  }
-//
-//  final String serverInfo = getServletContext().getServerInfo();
-//  String userAgent = getThreadLocalRequest().getHeader("User-Agent");
-//
-//  // Escape data from the client to avoid cross-site script vulnerabilities.
-//  userAgent = escapeHtml(userAgent);
-//
-//  return "Hello, " + escapeHtml(input) + "!<br><br>I am running " + serverInfo +
-//         ".<br><br>It looks like you are using:<br>" + userAgent;
-//}
-/**
- * Escape an html string. Escaping data received from the client helps to
- * prevent cross-site script vulnerabilities.
- * 
- * @param html the html string to escape
- * @return the escaped string
- */
-private String escapeHtml(final String html) {
-  if (html == null) {
-    return null;
-  }
-  return html.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-}
 }

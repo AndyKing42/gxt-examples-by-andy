@@ -15,11 +15,18 @@ package org.greatlogic.gxtexamples.client.glgwt;
 public interface IGLEnums {
 //--------------------------------------------------------------------------------------------------
 public enum EGLColumnDataType {
-DateTime,
-Decimal,
-Int,
-Money,
-String
+DateTime(false),
+Decimal(true),
+Int(true),
+Money(true),
+String(false);
+private final boolean _numeric;
+private EGLColumnDataType(final boolean numeric) {
+  _numeric = numeric;
+}
+public boolean getNumeric() {
+  return _numeric;
+}
 }
 //--------------------------------------------------------------------------------------------------
 public enum EGLDBConj {

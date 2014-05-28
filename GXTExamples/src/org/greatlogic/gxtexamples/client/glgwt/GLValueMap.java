@@ -27,11 +27,11 @@ import com.google.common.collect.Maps;
  * different data type than the data type of the original value, and the returned value will be
  * automatically converted (with a best guess attempt in some cases).
  */
-public class GLValueMap implements Cloneable {
+public class GLValueMap {
 //--------------------------------------------------------------------------------------------------
-private final boolean           _skipKeyUnderscores;
-private StringBuffer            _toStringSB;
-private TreeMap<String, Object> _valueMap;
+private final boolean                 _skipKeyUnderscores;
+private StringBuffer                  _toStringSB;
+private final TreeMap<String, Object> _valueMap;
 //--------------------------------------------------------------------------------------------------
 /**
  * Creates a new value map for storing values by key. The keys can be <code>String</code> values or
@@ -184,21 +184,6 @@ public String asString(final String key, final String defaultValue) {
 //--------------------------------------------------------------------------------------------------
 public void clear() {
   _valueMap.clear();
-}
-//--------------------------------------------------------------------------------------------------
-@SuppressWarnings("unchecked")
-@Override
-public GLValueMap clone() {
-  GLValueMap result;
-  try {
-    result = (GLValueMap)super.clone();
-  }
-  catch (final CloneNotSupportedException cnse) {
-    throw new InternalError();
-  }
-  _toStringSB = null;
-  _valueMap = (TreeMap<String, Object>)_valueMap.clone();
-  return result;
 }
 //--------------------------------------------------------------------------------------------------
 public boolean containsKey(final String key) {

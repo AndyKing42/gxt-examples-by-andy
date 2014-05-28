@@ -17,6 +17,7 @@ import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLColumnDataType;
 public interface IGLColumn {
 //--------------------------------------------------------------------------------------------------
 public EGLColumnDataType getDataType();
+public int getDefaultGridColumnWidth();
 public String getTitle();
 //--------------------------------------------------------------------------------------------------
 }

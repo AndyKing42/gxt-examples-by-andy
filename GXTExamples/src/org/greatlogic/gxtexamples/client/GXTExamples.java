@@ -2,7 +2,10 @@ package org.greatlogic.gxtexamples.client;
 
 import org.greatlogic.gxtexamples.client.glgwt.GLDBException;
 import org.greatlogic.gxtexamples.client.glgwt.GLSQL;
+import org.greatlogic.gxtexamples.client.glgwt.GLValueMapGridWidget;
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLDBOp;
+import org.greatlogic.gxtexamples.client.widget.GridWidgetManager;
+import org.greatlogic.gxtexamples.client.widget.MainLayoutWidget;
 import org.greatlogic.gxtexamples.shared.IDBEnums.EGXTExamplesTable;
 import org.greatlogic.gxtexamples.shared.IDBEnums.Person;
 import org.greatlogic.gxtexamples.shared.IRemoteService;
@@ -11,7 +14,6 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.box.MessageBox;
 
 public class GXTExamples implements EntryPoint {
@@ -49,14 +51,10 @@ private void login() {
 public void onModuleLoad() {
   _remoteService = GWT.create(IRemoteService.class);
   final MainLayoutWidget mainLayoutWidget = new MainLayoutWidget();
-  final boolean usePersonGrid = false;
   final boolean loadTestData = true;
-  final Widget gridWidget;
-  if (usePersonGrid) {
-    gridWidget = PersonGridWidget.getInstance(loadTestData).asWidget();
-  }
-  else {
-    gridWidget = PersonValueMapGridWidget.getInstance(loadTestData).asWidget();
+  final GLValueMapGridWidget gridWidget = GridWidgetManager.getPersonGrid("Main");
+  if (loadTestData) {
+    TestData.loadPersonTestData(gridWidget.getListStore(), 100);
   }
   mainLayoutWidget.getCenterPanel().setWidget(gridWidget);
   RootLayoutPanel.get().add(mainLayoutWidget);
