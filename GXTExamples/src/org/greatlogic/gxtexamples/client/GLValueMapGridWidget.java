@@ -1,9 +1,8 @@
 package org.greatlogic.gxtexamples.client;
 
 import java.util.ArrayList;
-import org.greatlogic.gxtexamples.client.glgwt.GLUtil;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueMap;
-import org.greatlogic.gxtexamples.shared.IDBEnums.Person;
+import org.greatlogic.gxtexamples.client.glgwt.IGLColumn;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,27 +20,15 @@ import com.sencha.gxt.widget.core.client.grid.GridView;
 import com.sencha.gxt.widget.core.client.grid.editing.GridEditing;
 import com.sencha.gxt.widget.core.client.grid.editing.GridInlineEditing;
 
-public class GLValueMapGridWidget implements IsWidget {
+public abstract class GLValueMapGridWidget implements IsWidget {
 //--------------------------------------------------------------------------------------------------
-private static GLValueMapGridWidget _valueMapGridWidget;
-
-private Grid<GLValueMap>            _grid;
-private ListStore<GLValueMap>       _listStore;
+private Grid<GLValueMap>        _grid;
+protected ListStore<GLValueMap> _listStore;
 //--------------------------------------------------------------------------------------------------
-static GLValueMapGridWidget getInstance(final boolean loadTestData) {
-  if (_valueMapGridWidget == null) {
-    _valueMapGridWidget = new GLValueMapGridWidget(loadTestData);
-  }
-  return _valueMapGridWidget;
-}
-//--------------------------------------------------------------------------------------------------
-private GLValueMapGridWidget(final boolean loadTestData) {
+public GLValueMapGridWidget(final IGLColumn keyColumn) {
   super();
-  createStore();
+  createStore(keyColumn);
   createGrid();
-  if (loadTestData) {
-    loadTestData(100);
-  }
 }
 //--------------------------------------------------------------------------------------------------
 @Override
@@ -66,10 +53,10 @@ private CheckBoxSelectionModel<GLValueMap> createCheckBoxSelectionModel() {
 }
 //--------------------------------------------------------------------------------------------------
 private void createColumnConfigString(final ArrayList<ColumnConfig<GLValueMap, ?>> columnConfigList,
-                                      final ValueProvider<GLValueMap, String> valueProvider,
-                                      final int width, final String header) {
+                                      final IGLColumn column, final int width) {
+  final ValueProvider<GLValueMap, String> valueProvider = new GLStringValueProvider(column);
   final ColumnConfig<GLValueMap, String> columnConfig;
-  columnConfig = new ColumnConfig<GLValueMap, String>(valueProvider, width, header);
+  columnConfig = new ColumnConfig<GLValueMap, String>(valueProvider, width, column.getTitle());
   columnConfig.setCell(new TextCell());
   columnConfigList.add(columnConfig);
 }
@@ -78,14 +65,9 @@ private ColumnModel<GLValueMap> createColumnModel(final CheckBoxSelectionModel<G
   final ArrayList<ColumnConfig<GLValueMap, ?>> columnConfigList;
   columnConfigList = new ArrayList<ColumnConfig<GLValueMap, ?>>();
   columnConfigList.add(selectionModel.getColumn());
-  createColumnConfigString(columnConfigList, new GLStringValueProvider(Person.DisplayName), 150,
-                           "Display Name");
-  createColumnConfigString(columnConfigList, new GLStringValueProvider(Person.LoginName), 150,
-                           "Login Name");
-  createColumnConfigString(columnConfigList, new GLStringValueProvider(Person.FirstName), 150,
-                           "First Name");
-  createColumnConfigString(columnConfigList, new GLStringValueProvider(Person.LastName), 150,
-                           "Last Name");
+  for (final IGLColumn column : getColumns()) {
+    createColumnConfigString(columnConfigList, column, 150);
+  }
   return new ColumnModel<GLValueMap>(columnConfigList);
 }
 //--------------------------------------------------------------------------------------------------
@@ -116,56 +98,16 @@ private GridView<GLValueMap> createGridView() {
   return result;
 }
 //--------------------------------------------------------------------------------------------------
-private void createStore() {
+private void createStore(final IGLColumn keyColumn) {
   final ModelKeyProvider<GLValueMap> modelKeyProvider = new ModelKeyProvider<GLValueMap>() {
     @Override
     public String getKey(final GLValueMap valueMap) {
-      return valueMap.asString(Person.PersonID);
+      return valueMap.asString(keyColumn);
     }
   };
   _listStore = new ListStore<GLValueMap>(modelKeyProvider);
 }
 //--------------------------------------------------------------------------------------------------
-private static final String[] FirstNames = new String[] {"Aarav", "Abdiel", "Abrielle", "Addilyn",
-    "Adrian", "Albert", "Alyvia", "America", "Amiya", "Andre", "Andy", "Angeline", "Arthur",
-    "Augustus", "Aya", "Aylin", "Bailey", "Blake", "Braden", "Camdyn", "Cameron", "Camryn",
-    "Celeste", "Christian", "Christine", "Clayton", "Dariel", "Darrell", "Dayton", "Devon",
-    "Donovan", "Douglas", "Eden", "Edwin", "Eliza", "Emmy", "Enzo", "Erin", "Finn", "Foster",
-    "Franklin", "Gabriela", "Gracelynn", "Hailee", "Hallie", "Hector", "Jaida", "Jaylah",
-    "Johnathon", "Josephine", "Journey", "Junior", "Kade", "Kailey", "Kaitlin", "Kaylyn",
-    "Kendall", "Kevin", "Khalil", "Kobe", "Kohen", "Konnor", "Kyree", "Kyrie", "Lila", "Lillie",
-    "Lionel", "Litzy", "Lorenzo", "Lydia", "Macy", "Madyson", "Matilda", "Mayson", "Melanie",
-    "Melody", "Mila", "Nevaeh", "Nicole", "Omar", "Paisley", "Paityn", "Presley", "Quentin",
-    "Raven", "Roselyn", "Ryker", "Rylan", "Sadie", "Sidney", "Silas", "Stanley", "Terrell",
-    "Tiffany", "Winston", "Yesenia"      };
-private static final String[] LastNames  = new String[] {"Adamson", "Anderson", "Atkinson",
-    "Ballantyne", "Barclay", "Barton", "Baxter", "Beattie", "Bennett", "Bernard", "Blakey",
-    "Booth", "Bowman", "Braithwaite", "Bristow", "Browne", "Bullock", "Byrne", "Carroll", "Clark",
-    "Collett", "Crane", "Cummings", "Denton", "Donald", "Dougal", "Fairhurst", "Fenton", "Fraser",
-    "Gibbins", "Gillespie", "Gillett", "Grainger", "Greaves", "Hancock", "Harper", "Heath",
-    "Hepburn", "Higgins", "Hindle", "Hine", "Hodgson", "Humphreys", "Hyde", "Jacob", "Judge",
-    "King", "Kirkpatrick", "Knight", "Kumar", "Lawrence", "Leonard", "Logan", "Lord", "Maher",
-    "Major", "Mann", "Marriott", "Martinez", "Moorhouse", "Murray", "Noon", "Norton", "Oconnor",
-    "Ogden", "Paine", "Paton", "Peebles", "Pickard", "Rees", "Ricketts", "Rooney", "Rutherford",
-    "Simon", "Simons", "Singleton", "Skinner", "Stannard", "Steere", "Stuart", "Sylvester",
-    "Tierney", "Tucker", "Vincent", "Wale", "Waters", "Watson", "Watts", "Webb", "Webster",
-    "White", "Wicks", "Wilkie", "Wilkins", "Wooldridge"};
-private void loadTestData(final int numberOfRecords) {
-  _listStore.clear();
-  for (int recordCount = 0; recordCount < numberOfRecords; ++recordCount) {
-    final String firstName = FirstNames[GLUtil.getRandomInt(FirstNames.length)];
-    final String lastName = LastNames[GLUtil.getRandomInt(LastNames.length)];
-    final GLValueMap valueMap = new GLValueMap(false);
-    valueMap.put(Person.CurrentOrgId, 1);
-    valueMap.put(Person.DisplayName, firstName + " " + lastName);
-    valueMap.put(Person.EmailAddress, firstName + "-" + lastName + "@gmail.com");
-    valueMap.put(Person.FirstName, firstName);
-    valueMap.put(Person.LastName, lastName);
-    valueMap.put(Person.LoginName, firstName + "." + lastName);
-    valueMap.put(Person.PersonID, recordCount + 1);
-    valueMap.put(Person.Version, "1");
-    _listStore.add(valueMap);
-  }
-}
+protected abstract IGLColumn[] getColumns();
 //--------------------------------------------------------------------------------------------------
 }

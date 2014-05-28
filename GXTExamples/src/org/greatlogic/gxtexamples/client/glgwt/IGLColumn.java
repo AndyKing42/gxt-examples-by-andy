@@ -1,4 +1,6 @@
 package org.greatlogic.gxtexamples.client.glgwt;
+
+import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLColumnDataType;
 /*
  * Copyright 2006 Andy King (GreatLogic.com)
  * 
@@ -13,5 +15,8 @@ package org.greatlogic.gxtexamples.client.glgwt;
  * the License.
  */
 public interface IGLColumn {
+//--------------------------------------------------------------------------------------------------
+public EGLColumnDataType getDataType();
+public String getTitle();
 //--------------------------------------------------------------------------------------------------
 }

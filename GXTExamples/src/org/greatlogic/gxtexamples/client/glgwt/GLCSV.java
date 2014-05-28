@@ -36,12 +36,12 @@ public static StringBuilder appendCSVValue(final StringBuilder sb, final Object 
   }
   String stringValue = value == null ? "" : value.toString();
   if (stringValue.indexOf(delimiter) >= 0) {
-    stringValue =
-                  delimiter + stringValue.replace("" + delimiter, "" + delimiter + delimiter) +
-                          delimiter;
+    stringValue = delimiter + stringValue.replace("" + delimiter, "" + delimiter + delimiter) + //
+                  delimiter;
   }
   else if (stringValue.indexOf(separator) >= 0 ||
-           (!stringValue.isEmpty() && (stringValue.charAt(0) == ' ' || stringValue.charAt(stringValue.length() - 1) == ' '))) {
+           (!stringValue.isEmpty() && (stringValue.charAt(0) == ' ' || //
+           stringValue.charAt(stringValue.length() - 1) == ' '))) {
     stringValue = delimiter + stringValue + delimiter;
   }
   sb.append(stringValue);
@@ -110,8 +110,8 @@ public static List<String> extract(final List<String> origList, final String csv
         boolean doubleDelimiter = false;
         do {
           if (endIndex == csv.length()) {
-            throw new GLCSVException(EGLCSVException.MissingEndDelimiter, "At position:" +
-                                                                          beginIndex);
+            throw new GLCSVException(EGLCSVException.MissingEndDelimiter, //
+                                     "At position:" + beginIndex);
           }
           if (csv.charAt(endIndex) == delimiter) {
             endOfValue = endIndex == csv.length() - 1 || csv.charAt(endIndex + 1) != delimiter;
@@ -127,8 +127,8 @@ public static List<String> extract(final List<String> origList, final String csv
         ++endIndex;
         while (endIndex < csv.length() && csv.charAt(endIndex) != separator) {
           if (csv.charAt(endIndex) != ' ') {
-            throw new GLCSVException(EGLCSVException.InvalidCharacter, "At position:" + endIndex +
-                                                                       1);
+            throw new GLCSVException(EGLCSVException.InvalidCharacter, //
+                                     "At position:" + endIndex + 1);
           }
           ++endIndex;
         }
@@ -146,6 +146,6 @@ public static List<String> extract(final List<String> origList, final String csv
     result.add("");
   }
   return result;
-} // extract()
+}
 //--------------------------------------------------------------------------------------------------
 }

@@ -14,6 +14,14 @@ package org.greatlogic.gxtexamples.client.glgwt;
  */
 public interface IGLEnums {
 //--------------------------------------------------------------------------------------------------
+public enum EGLColumnDataType {
+DateTime,
+Decimal,
+Int,
+Money,
+String
+}
+//--------------------------------------------------------------------------------------------------
 public enum EGLDBConj {
 And,
 Or
