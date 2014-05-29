@@ -1,6 +1,7 @@
 package org.greatlogic.gxtexamples.client.glgwt;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLIntegerValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLStringValueProvider;
 import com.google.gwt.cell.client.TextCell;
@@ -11,7 +12,9 @@ import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
+import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.widget.core.client.event.RefreshEvent;
+import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.form.IntegerField;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.CheckBoxSelectionModel;
@@ -125,7 +128,9 @@ private void createEditors() {
       case Money:
         break;
       case String:
-        gridEditing.addEditor((ColumnConfig<GLValueMap, String>)columnConfig, new TextField());
+        final TextField field = new TextField();
+        field.setName(gridColumnDef.getColumn().toString());
+        gridEditing.addEditor((ColumnConfig<GLValueMap, String>)columnConfig, field);
         break;
     }
   }
@@ -135,6 +140,15 @@ private void createGrid() {
   final CheckBoxSelectionModel<GLValueMap> selectionModel = createCheckBoxSelectionModel();
   final ColumnModel<GLValueMap> columnModel = createColumnModel(selectionModel);
   _grid = new Grid<GLValueMap>(_listStore, columnModel);
+  _grid.addRowClickHandler(new RowClickEvent.RowClickHandler() {
+    @Override
+    public void onRowClick(final RowClickEvent event) {
+      final Collection<Store<GLValueMap>.Record> records = _listStore.getModifiedRecords();
+      if (records.size() > 0) {
+        _grid.setBorders(false);
+      }
+    }
+  });
   _grid.setBorders(true);
   _grid.setColumnReordering(true);
   _grid.setLoadMask(true);

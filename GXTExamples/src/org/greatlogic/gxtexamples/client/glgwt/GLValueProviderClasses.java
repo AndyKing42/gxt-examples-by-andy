@@ -19,7 +19,7 @@ public void setValue(final GLValueMap valueMap, final Integer value) {
 }
 @Override
 public String getPath() {
-  return null;
+  return _column.toString();
 }
 }
 //==================================================================================================
@@ -38,7 +38,7 @@ public void setValue(final GLValueMap valueMap, final String value) {
 }
 @Override
 public String getPath() {
-  return null;
+  return _column.toString();
 }
 }
 //==================================================================================================
