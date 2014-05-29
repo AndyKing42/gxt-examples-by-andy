@@ -15,6 +15,9 @@ package org.greatlogic.gxtexamples.client.glgwt;
 public interface IGLEnums {
 //--------------------------------------------------------------------------------------------------
 public enum EGLColumnDataType {
+Boolean(false),
+Currency(true),
+Date(false),
 DateTime(false),
 Decimal(true),
 Int(true),

@@ -7,7 +7,7 @@ import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLDBOp;
 import org.greatlogic.gxtexamples.client.widget.GridWidgetManager;
 import org.greatlogic.gxtexamples.client.widget.MainLayoutWidget;
 import org.greatlogic.gxtexamples.shared.IDBEnums.EGXTExamplesTable;
-import org.greatlogic.gxtexamples.shared.IDBEnums.Person;
+import org.greatlogic.gxtexamples.shared.IDBEnums.Pet;
 import org.greatlogic.gxtexamples.shared.IRemoteService;
 import org.greatlogic.gxtexamples.shared.IRemoteServiceAsync;
 import com.google.gwt.core.client.EntryPoint;
@@ -23,9 +23,9 @@ private IRemoteServiceAsync _remoteService;
 private void loadPersons() {
   try {
     final GLSQL personSQL = GLSQL.select();
-    personSQL.from(EGXTExamplesTable.Person);
-    personSQL.whereAnd(Person.PersonID, EGLDBOp.LessThan, 10);
-    personSQL.orderBy(EGXTExamplesTable.Person, Person.FirstName, true);
+    personSQL.from(EGXTExamplesTable.Pet);
+    personSQL.whereAnd(Pet.PetID, EGLDBOp.LessThan, 10);
+    personSQL.orderBy(EGXTExamplesTable.Pet, Pet.PetName, true);
     select(personSQL);
   }
   catch (final GLDBException dbe) {

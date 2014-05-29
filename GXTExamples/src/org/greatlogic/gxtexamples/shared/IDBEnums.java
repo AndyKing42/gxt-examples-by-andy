@@ -7,26 +7,66 @@ import org.greatlogic.gxtexamples.client.glgwt.IGLTable;
 public interface IDBEnums {
 //--------------------------------------------------------------------------------------------------
 public enum EGXTExamplesTable implements IGLTable {
-Person
+Pet,
+PetType
 }
 //--------------------------------------------------------------------------------------------------
-public enum Person implements IGLColumn {
-CurrentOrgId(EGLColumnDataType.Int, "Current Org", 50),
-DisplayName(EGLColumnDataType.String, "Display Name", 100),
-EmailAddress(EGLColumnDataType.String, "Email Address", 100),
-FirstName(EGLColumnDataType.String, "First Name", 80),
-LastName(EGLColumnDataType.String, "Last Name", 80),
-LoginName(EGLColumnDataType.String, "Login Name", 80),
-PersonID(EGLColumnDataType.Int, "Id", 50),
-Version(EGLColumnDataType.String, "Version", 50);
+public enum Pet implements IGLColumn {
+AdoptionFee(EGLColumnDataType.Currency, "Adoption Fee", 50),
+FosterDate(EGLColumnDataType.DateTime, "Foster Date/Time", 100),
+IntakeDate(EGLColumnDataType.Date, "Intake Date", 100),
+PetName(EGLColumnDataType.String, "Pet Name", 80),
+PetID(EGLColumnDataType.Int, "Id", 50),
+Sex(EGLColumnDataType.String, "Sex", 50, new String[] {"F", "M", "U"}),
+TrainedFlag(EGLColumnDataType.Boolean, "Trained?", 50);
+private final String[]          _choices;
 private final EGLColumnDataType _dataType;
 private final int               _defaultGridColumnWidth;
 private final String            _title;
-private Person(final EGLColumnDataType dataType, final String title,
-               final int defaultGridColumnWidth) {
+private Pet(final EGLColumnDataType dataType, final String title, final int defaultGridColumnWidth) {
+  this(dataType, title, defaultGridColumnWidth, null);
+}
+private Pet(final EGLColumnDataType dataType, final String title, final int defaultGridColumnWidth,
+            final String[] choices) {
   _dataType = dataType;
   _title = title;
   _defaultGridColumnWidth = defaultGridColumnWidth;
+  _choices = choices;
+}
+@Override
+public String[] getChoices() {
+  return _choices;
+}
+@Override
+public EGLColumnDataType getDataType() {
+  return _dataType;
+}
+@Override
+public int getDefaultGridColumnWidth() {
+  return _defaultGridColumnWidth;
+}
+@Override
+public String getTitle() {
+  return _title;
+}
+}
+//--------------------------------------------------------------------------------------------------
+public enum PetType implements IGLColumn {
+PetTypeCode(EGLColumnDataType.String, "Pet Type Code", 50),
+PetTypeDesc(EGLColumnDataType.String, "Pet Type Desc", 100),
+PetTypeId(EGLColumnDataType.Int, "Id", 50);
+private final EGLColumnDataType _dataType;
+private final int               _defaultGridColumnWidth;
+private final String            _title;
+private PetType(final EGLColumnDataType dataType, final String title,
+                final int defaultGridColumnWidth) {
+  _dataType = dataType;
+  _title = title;
+  _defaultGridColumnWidth = defaultGridColumnWidth;
+}
+@Override
+public String[] getChoices() {
+  return null;
 }
 @Override
 public EGLColumnDataType getDataType() {

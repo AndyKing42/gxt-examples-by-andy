@@ -2,7 +2,7 @@ package org.greatlogic.gxtexamples.client;
 
 import org.greatlogic.gxtexamples.client.glgwt.GLUtil;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueMap;
-import org.greatlogic.gxtexamples.shared.IDBEnums.Person;
+import org.greatlogic.gxtexamples.shared.IDBEnums.Pet;
 import com.sencha.gxt.data.shared.ListStore;
 
 public class TestData {
@@ -38,14 +38,14 @@ public static void loadPersonTestData(final ListStore<GLValueMap> listStore,
     final String firstName = FirstNames[GLUtil.getRandomInt(FirstNames.length)];
     final String lastName = LastNames[GLUtil.getRandomInt(LastNames.length)];
     final GLValueMap valueMap = new GLValueMap(false);
-    valueMap.put(Person.CurrentOrgId, 1);
-    valueMap.put(Person.DisplayName, firstName + " " + lastName);
-    valueMap.put(Person.EmailAddress, firstName + "-" + lastName + "@gmail.com");
-    valueMap.put(Person.FirstName, firstName);
-    valueMap.put(Person.LastName, lastName);
-    valueMap.put(Person.LoginName, firstName + "." + lastName);
-    valueMap.put(Person.PersonID, recordCount + 1);
-    valueMap.put(Person.Version, "1");
+    valueMap.put(Pet.AdoptionFee, 1);
+    valueMap.put(Pet.DateOfBirth, firstName + " " + lastName);
+    valueMap.put(Pet.EmailAddress, firstName + "-" + lastName + "@gmail.com");
+    valueMap.put(Pet.PetName, firstName);
+    valueMap.put(Pet.LastName, lastName);
+    valueMap.put(Pet.LoginName, firstName + "." + lastName);
+    valueMap.put(Pet.PetID, recordCount + 1);
+    valueMap.put(Pet.Sex, "1");
     listStore.add(valueMap);
   }
 }
