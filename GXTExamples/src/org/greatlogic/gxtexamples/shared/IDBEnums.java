@@ -13,10 +13,12 @@ PetType
 //--------------------------------------------------------------------------------------------------
 public enum Pet implements IGLColumn {
 AdoptionFee(EGLColumnDataType.Currency, "Adoption Fee", 50),
-FosterDate(EGLColumnDataType.DateTime, "Foster Date/Time", 100),
-IntakeDate(EGLColumnDataType.Date, "Intake Date", 100),
+FosterDate(EGLColumnDataType.Date, "Foster Date", 100),
+IntakeDate(EGLColumnDataType.DateTime, "Intake Date/Time", 100),
+NumberOfFosters(EGLColumnDataType.Int, "Number Of Fosters", 20),
+PetId(EGLColumnDataType.Int, "Id", 50),
 PetName(EGLColumnDataType.String, "Pet Name", 80),
-PetID(EGLColumnDataType.Int, "Id", 50),
+PetTypeId(EGLColumnDataType.Int, "Pet Type", 80),
 Sex(EGLColumnDataType.String, "Sex", 50, new String[] {"F", "M", "U"}),
 TrainedFlag(EGLColumnDataType.Boolean, "Trained?", 50);
 private final String[]          _choices;

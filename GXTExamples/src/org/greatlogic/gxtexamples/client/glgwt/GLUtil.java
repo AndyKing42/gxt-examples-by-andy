@@ -13,14 +13,37 @@ package org.greatlogic.gxtexamples.client.glgwt;
  * the License.
  */
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Random;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
+import com.sencha.gxt.data.shared.ListStore;
+import com.sencha.gxt.data.shared.ModelKeyProvider;
 
 public class GLUtil {
 //--------------------------------------------------------------------------------------------------
-private static Random _random;
+private static DateTimeFormat _yyyymmddDateTimeFormat;
+private static Random         _random;
 //--------------------------------------------------------------------------------------------------
 static {
   _random = new Random(System.currentTimeMillis());
+  _yyyymmddDateTimeFormat = DateTimeFormat.getFormat("yyyyMMdd");
+}
+//--------------------------------------------------------------------------------------------------
+public static ListStore<GLValueMap> createListStore(final IGLColumn keyColumn) {
+  final ModelKeyProvider<GLValueMap> modelKeyProvider = new ModelKeyProvider<GLValueMap>() {
+    @Override
+    public String getKey(final GLValueMap valueMap) {
+      return valueMap.asString(keyColumn);
+    }
+  };
+  return new ListStore<GLValueMap>(modelKeyProvider);
+}
+//--------------------------------------------------------------------------------------------------
+public static String dateAddDays(final String originalDate, final int numberOfDays) {
+  final Date newDate = _yyyymmddDateTimeFormat.parseStrict(originalDate);
+  CalendarUtil.addDaysToDate(newDate, numberOfDays);
+  return _yyyymmddDateTimeFormat.format(newDate);
 }
 //--------------------------------------------------------------------------------------------------
 /**
@@ -143,9 +166,8 @@ public static boolean stringToBoolean(final CharSequence stringValue, final bool
     result = defaultValue;
   }
   else {
-    result =
-             stringValue.charAt(0) == 'y' || stringValue.charAt(0) == 'Y' ||
-                     stringValue.toString().equalsIgnoreCase("true");
+    result = stringValue.charAt(0) == 'y' || stringValue.charAt(0) == 'Y' ||
+             stringValue.toString().equalsIgnoreCase("true");
   }
   return result;
 }

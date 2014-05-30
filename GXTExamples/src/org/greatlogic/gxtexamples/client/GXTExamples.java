@@ -2,18 +2,22 @@ package org.greatlogic.gxtexamples.client;
 
 import org.greatlogic.gxtexamples.client.glgwt.GLDBException;
 import org.greatlogic.gxtexamples.client.glgwt.GLSQL;
+import org.greatlogic.gxtexamples.client.glgwt.GLUtil;
+import org.greatlogic.gxtexamples.client.glgwt.GLValueMap;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueMapGridWidget;
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLDBOp;
 import org.greatlogic.gxtexamples.client.widget.GridWidgetManager;
 import org.greatlogic.gxtexamples.client.widget.MainLayoutWidget;
 import org.greatlogic.gxtexamples.shared.IDBEnums.EGXTExamplesTable;
 import org.greatlogic.gxtexamples.shared.IDBEnums.Pet;
+import org.greatlogic.gxtexamples.shared.IDBEnums.PetType;
 import org.greatlogic.gxtexamples.shared.IRemoteService;
 import org.greatlogic.gxtexamples.shared.IRemoteServiceAsync;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.box.MessageBox;
 
 public class GXTExamples implements EntryPoint {
@@ -24,7 +28,7 @@ private void loadPersons() {
   try {
     final GLSQL personSQL = GLSQL.select();
     personSQL.from(EGXTExamplesTable.Pet);
-    personSQL.whereAnd(Pet.PetID, EGLDBOp.LessThan, 10);
+    personSQL.whereAnd(Pet.PetId, EGLDBOp.LessThan, 10);
     personSQL.orderBy(EGXTExamplesTable.Pet, Pet.PetName, true);
     select(personSQL);
   }
@@ -54,7 +58,9 @@ public void onModuleLoad() {
   final boolean loadTestData = true;
   final GLValueMapGridWidget gridWidget = GridWidgetManager.getPersonGrid("Main");
   if (loadTestData) {
-    TestData.loadPersonTestData(gridWidget.getListStore(), 100);
+    final ListStore<GLValueMap> petTypeListStore = GLUtil.createListStore(PetType.PetTypeId);
+    TestData.loadPetTypeTestData(petTypeListStore);
+    TestData.loadPetTestData(gridWidget.getListStore());
   }
   mainLayoutWidget.getCenterPanel().setWidget(gridWidget);
   RootLayoutPanel.get().add(mainLayoutWidget);

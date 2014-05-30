@@ -11,7 +11,6 @@ import com.sencha.gxt.cell.core.client.NumberCell;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.ListStore;
-import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.widget.core.client.event.RefreshEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
@@ -35,7 +34,7 @@ private final String                 _noRowsMessage;
 protected GLValueMapGridWidget(final String noRowsMessage, final IGLColumn keyColumn) {
   super();
   _noRowsMessage = noRowsMessage == null ? "There are no results to display" : noRowsMessage;
-  createStore(keyColumn);
+  _listStore = GLUtil.createListStore(keyColumn);
   _gridColumnDefList = new ArrayList<GLGridColumnDef>();
   loadGridColumnDefList();
   createGrid();
@@ -164,16 +163,6 @@ private GridView<GLValueMap> createGridView() {
   result.setForceFit(false);
   result.setStripeRows(true);
   return result;
-}
-//--------------------------------------------------------------------------------------------------
-private void createStore(final IGLColumn keyColumn) {
-  final ModelKeyProvider<GLValueMap> modelKeyProvider = new ModelKeyProvider<GLValueMap>() {
-    @Override
-    public String getKey(final GLValueMap valueMap) {
-      return valueMap.asString(keyColumn);
-    }
-  };
-  _listStore = new ListStore<GLValueMap>(modelKeyProvider);
 }
 //--------------------------------------------------------------------------------------------------
 public ListStore<GLValueMap> getListStore() {
