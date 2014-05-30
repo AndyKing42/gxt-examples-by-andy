@@ -24,13 +24,13 @@ public class GXTExamples implements EntryPoint {
 //--------------------------------------------------------------------------------------------------
 private IRemoteServiceAsync _remoteService;
 //--------------------------------------------------------------------------------------------------
-private void loadPersons() {
+private void loadPets() {
   try {
-    final GLSQL personSQL = GLSQL.select();
-    personSQL.from(EGXTExamplesTable.Pet);
-    personSQL.whereAnd(Pet.PetId, EGLDBOp.LessThan, 10);
-    personSQL.orderBy(EGXTExamplesTable.Pet, Pet.PetName, true);
-    select(personSQL);
+    final GLSQL petSQL = GLSQL.select();
+    petSQL.from(EGXTExamplesTable.Pet);
+    petSQL.whereAnd(Pet.PetId, EGLDBOp.LessThan, 10);
+    petSQL.orderBy(EGXTExamplesTable.Pet, Pet.PetName, true);
+    select(petSQL);
   }
   catch (final GLDBException dbe) {
 
@@ -56,7 +56,7 @@ public void onModuleLoad() {
   _remoteService = GWT.create(IRemoteService.class);
   final MainLayoutWidget mainLayoutWidget = new MainLayoutWidget();
   final boolean loadTestData = true;
-  final GLValueMapGridWidget gridWidget = GridWidgetManager.getPersonGrid("Main");
+  final GLValueMapGridWidget gridWidget = GridWidgetManager.getPetGrid("Main");
   if (loadTestData) {
     final ListStore<GLValueMap> petTypeListStore = GLUtil.createListStore(PetType.PetTypeId);
     TestData.loadPetTypeTestData(petTypeListStore);
@@ -64,7 +64,7 @@ public void onModuleLoad() {
   }
   mainLayoutWidget.getCenterPanel().setWidget(gridWidget);
   RootLayoutPanel.get().add(mainLayoutWidget);
-  loadPersons();
+  loadPets();
 }
 //--------------------------------------------------------------------------------------------------
 private void select(final GLSQL sql) {

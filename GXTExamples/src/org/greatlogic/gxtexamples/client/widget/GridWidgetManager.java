@@ -12,7 +12,7 @@ static {
   _gridWidgetMap = new TreeMap<String, GLValueMapGridWidget>();
 }
 //--------------------------------------------------------------------------------------------------
-public static PetGridWidget getPersonGrid(final String gridName) {
+public static PetGridWidget getPetGrid(final String gridName) {
   PetGridWidget result = (PetGridWidget)_gridWidgetMap.get(gridName);
   if (result == null) {
     result = new PetGridWidget();
