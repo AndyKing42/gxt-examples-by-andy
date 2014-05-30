@@ -20,7 +20,7 @@ PetId(EGLColumnDataType.Int, 0, "Id", 50),
 PetName(EGLColumnDataType.String, 0, "Pet Name", 80),
 PetTypeId(EGLColumnDataType.Int, 0, "Pet Type", 80),
 Sex(EGLColumnDataType.String, 0, "Sex", 50, new String[] {"F", "M", "U"}),
-TrainedFlag(EGLColumnDataType.Boolean, 0, "Trained?", 50);
+TrainedFlag(EGLColumnDataType.Boolean, 0, "Trained?", 80);
 private final String[]          _choices;
 private final EGLColumnDataType _dataType;
 private final int               _defaultGridColumnWidth;

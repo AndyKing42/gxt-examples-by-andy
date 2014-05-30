@@ -18,6 +18,7 @@ import com.sencha.gxt.cell.core.client.NumberCell;
 import com.sencha.gxt.cell.core.client.form.CheckBoxCell;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.ValueProvider;
+import com.sencha.gxt.core.client.util.TextMetrics;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.widget.core.client.ContentPanel;
@@ -36,6 +37,8 @@ import com.sencha.gxt.widget.core.client.grid.CheckBoxSelectionModel;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
+import com.sencha.gxt.widget.core.client.grid.Grid.Callback;
+import com.sencha.gxt.widget.core.client.grid.Grid.GridCell;
 import com.sencha.gxt.widget.core.client.grid.GridSelectionModel;
 import com.sencha.gxt.widget.core.client.grid.GridView;
 import com.sencha.gxt.widget.core.client.grid.editing.GridEditing;
@@ -66,6 +69,13 @@ public Widget asWidget() {
   return _contentPanel;
 }
 //--------------------------------------------------------------------------------------------------
+protected void centerCheckBox(final ColumnConfig<GLValueMap, ?> columnConfig) {
+  final int leftPadding = (columnConfig.getWidth() - 12) / 2;
+  final String styles = "padding: 3px 0px 0px " + leftPadding + "px;";
+  final SafeStyles textStyles = SafeStylesUtils.fromTrustedString(styles);
+  columnConfig.setColumnTextStyle(textStyles);
+}
+//--------------------------------------------------------------------------------------------------
 private CheckBoxSelectionModel<GLValueMap> createCheckBoxSelectionModel() {
   CheckBoxSelectionModel<GLValueMap> result;
   final IdentityValueProvider<GLValueMap> identityValueProvider;
@@ -91,6 +101,7 @@ private ColumnConfig<GLValueMap, Boolean> createColumnConfigBoolean(final GLGrid
                                                  column.getTitle());
   result.setHorizontalAlignment(gridColumnDef.getHorizontalAlignment());
   result.setCell(new CheckBoxCell());
+  centerCheckBox(result);
   return result;
 }
 //--------------------------------------------------------------------------------------------------
@@ -179,11 +190,16 @@ private ColumnModel<GLValueMap> createColumnModel(final GridSelectionModel<GLVal
   result.addColumnWidthChangeHandler(new ColumnWidthChangeHandler() {
     @Override
     public void onColumnWidthChange(final ColumnWidthChangeEvent event) {
+      final GridCell cell = _grid.walkCells(3, 2, 0, new Callback() {
+        @Override
+        public boolean isSelectable(final GridCell cell2) {
+          return true;
+        }
+      });
+      final int width = TextMetrics.get().getWidth("Hello");
       final ColumnConfig<GLValueMap, ?> columnConfig = columnConfigList.get(event.getIndex());
       if (columnConfig.getCell() instanceof CheckBoxCell) {
-        final String styles = "padding: 20px 30px 0px 20px;";
-        final SafeStyles textStyles = SafeStylesUtils.fromTrustedString(styles);
-        columnConfig.setColumnTextStyle(textStyles);
+        centerCheckBox(columnConfig);
         _grid.getView().refresh(true);
       }
     }
