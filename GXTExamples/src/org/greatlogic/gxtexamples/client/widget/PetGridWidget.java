@@ -7,7 +7,7 @@ import org.greatlogic.gxtexamples.shared.IDBEnums.Pet;
 public class PetGridWidget extends GLValueMapGridWidget {
 //--------------------------------------------------------------------------------------------------
 public PetGridWidget() {
-  super(null, Pet.PetId);
+  super(null, null, Pet.PetId);
 }
 //--------------------------------------------------------------------------------------------------
 @Override

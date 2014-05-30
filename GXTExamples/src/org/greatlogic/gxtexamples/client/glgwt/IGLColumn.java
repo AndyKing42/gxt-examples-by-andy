@@ -19,6 +19,7 @@ public interface IGLColumn {
 public String[] getChoices();
 public EGLColumnDataType getDataType();
 public int getDefaultGridColumnWidth();
+public int getNumberOfDecimalPlaces();
 public String getTitle();
 //--------------------------------------------------------------------------------------------------
 }

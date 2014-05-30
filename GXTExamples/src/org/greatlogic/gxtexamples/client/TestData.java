@@ -33,7 +33,7 @@ public static void loadPetTestData(final ListStore<GLValueMap> listStore) {
     final String intakeTime = (hour < 10 ? "0" : "") + hour + (minute < 10 ? "0" : "") + minute;
     final String fosterDate = GLUtil.dateAddDays(intakeDate, 60);
     final GLValueMap valueMap = new GLValueMap(false);
-    valueMap.put(Pet.AdoptionFee, 1);
+    valueMap.put(Pet.AdoptionFee, GLUtil.getRandomInt(3000, 10000) / 100.0);
     valueMap.put(Pet.FosterDate, fosterDate);
     valueMap.put(Pet.IntakeDate, intakeDate + intakeTime);
     valueMap.put(Pet.PetId, nextPetId);

@@ -12,25 +12,28 @@ PetType
 }
 //--------------------------------------------------------------------------------------------------
 public enum Pet implements IGLColumn {
-AdoptionFee(EGLColumnDataType.Currency, "Adoption Fee", 50),
-FosterDate(EGLColumnDataType.Date, "Foster Date", 100),
-IntakeDate(EGLColumnDataType.DateTime, "Intake Date/Time", 100),
-NumberOfFosters(EGLColumnDataType.Int, "Number Of Fosters", 20),
-PetId(EGLColumnDataType.Int, "Id", 50),
-PetName(EGLColumnDataType.String, "Pet Name", 80),
-PetTypeId(EGLColumnDataType.Int, "Pet Type", 80),
-Sex(EGLColumnDataType.String, "Sex", 50, new String[] {"F", "M", "U"}),
-TrainedFlag(EGLColumnDataType.Boolean, "Trained?", 50);
+AdoptionFee(EGLColumnDataType.Currency, 2, "Adoption Fee", 100),
+FosterDate(EGLColumnDataType.Date, 0, "Foster Date", 100),
+IntakeDate(EGLColumnDataType.DateTime, 0, "Intake Date/Time", 100),
+NumberOfFosters(EGLColumnDataType.Int, 0, "Number Of Fosters", 20),
+PetId(EGLColumnDataType.Int, 0, "Id", 50),
+PetName(EGLColumnDataType.String, 0, "Pet Name", 80),
+PetTypeId(EGLColumnDataType.Int, 0, "Pet Type", 80),
+Sex(EGLColumnDataType.String, 0, "Sex", 50, new String[] {"F", "M", "U"}),
+TrainedFlag(EGLColumnDataType.Boolean, 0, "Trained?", 50);
 private final String[]          _choices;
 private final EGLColumnDataType _dataType;
 private final int               _defaultGridColumnWidth;
+private final int               _numberOfDecimalPlaces;
 private final String            _title;
-private Pet(final EGLColumnDataType dataType, final String title, final int defaultGridColumnWidth) {
-  this(dataType, title, defaultGridColumnWidth, null);
+private Pet(final EGLColumnDataType dataType, final int numberOfDecimalPlaces, final String title,
+            final int defaultGridColumnWidth) {
+  this(dataType, numberOfDecimalPlaces, title, defaultGridColumnWidth, null);
 }
-private Pet(final EGLColumnDataType dataType, final String title, final int defaultGridColumnWidth,
-            final String[] choices) {
+private Pet(final EGLColumnDataType dataType, final int numberOfDecimalPlaces, final String title,
+            final int defaultGridColumnWidth, final String[] choices) {
   _dataType = dataType;
+  _numberOfDecimalPlaces = numberOfDecimalPlaces;
   _title = title;
   _defaultGridColumnWidth = defaultGridColumnWidth;
   _choices = choices;
@@ -48,21 +51,27 @@ public int getDefaultGridColumnWidth() {
   return _defaultGridColumnWidth;
 }
 @Override
+public int getNumberOfDecimalPlaces() {
+  return _numberOfDecimalPlaces;
+}
+@Override
 public String getTitle() {
   return _title;
 }
 }
 //--------------------------------------------------------------------------------------------------
 public enum PetType implements IGLColumn {
-PetTypeCode(EGLColumnDataType.String, "Pet Type Code", 50),
-PetTypeDesc(EGLColumnDataType.String, "Pet Type Desc", 100),
-PetTypeId(EGLColumnDataType.Int, "Id", 50);
+PetTypeCode(EGLColumnDataType.String, 0, "Pet Type Code", 50),
+PetTypeDesc(EGLColumnDataType.String, 0, "Pet Type Desc", 100),
+PetTypeId(EGLColumnDataType.Int, 0, "Id", 50);
 private final EGLColumnDataType _dataType;
 private final int               _defaultGridColumnWidth;
+private final int               _numberOfDecimalPlaces;
 private final String            _title;
-private PetType(final EGLColumnDataType dataType, final String title,
-                final int defaultGridColumnWidth) {
+private PetType(final EGLColumnDataType dataType, final int numberOfDecimalPlaces,
+                final String title, final int defaultGridColumnWidth) {
   _dataType = dataType;
+  _numberOfDecimalPlaces = numberOfDecimalPlaces;
   _title = title;
   _defaultGridColumnWidth = defaultGridColumnWidth;
 }
@@ -77,6 +86,10 @@ public EGLColumnDataType getDataType() {
 @Override
 public int getDefaultGridColumnWidth() {
   return _defaultGridColumnWidth;
+}
+@Override
+public int getNumberOfDecimalPlaces() {
+  return _numberOfDecimalPlaces;
 }
 @Override
 public String getTitle() {

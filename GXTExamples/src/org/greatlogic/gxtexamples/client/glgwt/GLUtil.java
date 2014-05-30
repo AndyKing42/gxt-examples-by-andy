@@ -19,11 +19,14 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
+import com.sencha.gxt.widget.core.client.info.DefaultInfoConfig;
+import com.sencha.gxt.widget.core.client.info.Info;
+import com.sencha.gxt.widget.core.client.info.InfoConfig;
 
 public class GLUtil {
 //--------------------------------------------------------------------------------------------------
-private static DateTimeFormat _yyyymmddDateTimeFormat;
 private static Random         _random;
+private static DateTimeFormat _yyyymmddDateTimeFormat;
 //--------------------------------------------------------------------------------------------------
 static {
   _random = new Random(System.currentTimeMillis());
@@ -138,6 +141,13 @@ public static int getRandomInt(final int minValue, final int maxValue) {
   return _random.nextInt(maxValue - minValue) + minValue;
 }
 //--------------------------------------------------------------------------------------------------
+public static void info(final int seconds, final String message) {
+  final InfoConfig infoConfig = new DefaultInfoConfig("", message);
+  infoConfig.setDisplay(seconds * 1000);
+  final Info info = new Info();
+  info.show(infoConfig);
+}
+//--------------------------------------------------------------------------------------------------
 public static boolean isBlank(final CharSequence s) {
   return s == null || s.toString().trim().length() == 0;
 }
@@ -166,8 +176,9 @@ public static boolean stringToBoolean(final CharSequence stringValue, final bool
     result = defaultValue;
   }
   else {
-    result = stringValue.charAt(0) == 'y' || stringValue.charAt(0) == 'Y' ||
-             stringValue.toString().equalsIgnoreCase("true");
+    result =
+             stringValue.charAt(0) == 'y' || stringValue.charAt(0) == 'Y' ||
+                     stringValue.toString().equalsIgnoreCase("true");
   }
   return result;
 }
