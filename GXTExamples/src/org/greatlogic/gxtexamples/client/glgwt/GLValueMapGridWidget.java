@@ -3,12 +3,15 @@ package org.greatlogic.gxtexamples.client.glgwt;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.TreeMap;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLBigDecimalValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLBooleanValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLIntegerValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLStringValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLColumnDataType;
 import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safecss.shared.SafeStyles;
 import com.google.gwt.safecss.shared.SafeStylesUtils;
@@ -26,6 +29,8 @@ import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer.BoxLayoutPack;
 import com.sencha.gxt.widget.core.client.event.ColumnWidthChangeEvent;
 import com.sencha.gxt.widget.core.client.event.ColumnWidthChangeEvent.ColumnWidthChangeHandler;
+import com.sencha.gxt.widget.core.client.event.HeaderContextMenuEvent;
+import com.sencha.gxt.widget.core.client.event.HeaderContextMenuEvent.HeaderContextMenuHandler;
 import com.sencha.gxt.widget.core.client.event.RefreshEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
@@ -37,31 +42,67 @@ import com.sencha.gxt.widget.core.client.grid.CheckBoxSelectionModel;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
-import com.sencha.gxt.widget.core.client.grid.Grid.Callback;
-import com.sencha.gxt.widget.core.client.grid.Grid.GridCell;
 import com.sencha.gxt.widget.core.client.grid.GridSelectionModel;
 import com.sencha.gxt.widget.core.client.grid.GridView;
 import com.sencha.gxt.widget.core.client.grid.editing.GridEditing;
 import com.sencha.gxt.widget.core.client.grid.editing.GridInlineEditing;
+import com.sencha.gxt.widget.core.client.menu.Item;
+import com.sencha.gxt.widget.core.client.menu.MenuItem;
 
 public abstract class GLValueMapGridWidget implements IsWidget {
 //--------------------------------------------------------------------------------------------------
-private ContentPanel                 _contentPanel;
-private Grid<GLValueMap>             _grid;
-protected ArrayList<GLGridColumnDef> _gridColumnDefList;
-protected ListStore<GLValueMap>      _listStore;
-private final String                 _noRowsMessage;
+private final ArrayList<ColumnConfig<GLValueMap, ?>> _checkBoxList;
+private ContentPanel                                 _contentPanel;
+private Grid<GLValueMap>                             _grid;
+protected ArrayList<GLGridColumnDef>                 _gridColumnDefList;
+private TreeMap<String, GLGridColumnDef>             _gridColumnDefMap;
+protected ListStore<GLValueMap>                      _listStore;
+private final String                                 _noRowsMessage;
 //--------------------------------------------------------------------------------------------------
 protected GLValueMapGridWidget(final String headingText, final String noRowsMessage,
                                final IGLColumn keyColumn) {
   super();
   _noRowsMessage = noRowsMessage == null ? "There are no results to display" : noRowsMessage;
   _listStore = GLUtil.createListStore(keyColumn);
+  _checkBoxList = new ArrayList<ColumnConfig<GLValueMap, ?>>();
   _gridColumnDefList = new ArrayList<GLGridColumnDef>();
   loadGridColumnDefList();
+  createGridColumnDefMap();
   createContentPanel(headingText);
   createGrid();
   _contentPanel.add(_grid);
+}
+//--------------------------------------------------------------------------------------------------
+private void addHeaderContextMenuHandler() {
+  final HeaderContextMenuHandler headerContextMenuHandler = new HeaderContextMenuHandler() {
+    @Override
+    public void onHeaderContextMenu(final HeaderContextMenuEvent headerContextMenuEvent) {
+      final MenuItem menuItem = new MenuItem("Size To Fit");
+      menuItem.addSelectionHandler(new SelectionHandler<Item>() {
+        @Override
+        public void onSelection(final SelectionEvent<Item> selectionEvent) {
+          final int columnIndex = headerContextMenuEvent.getColumnIndex();
+          final ColumnConfig<GLValueMap, ?> columnConfig = _grid.getColumnModel().getColumn(columnIndex);
+          final GLGridColumnDef gridColumnDef = _gridColumnDefMap.get(columnConfig.getPath());
+          final TextMetrics textMetrics = TextMetrics.get();
+          textMetrics.bind(_grid.getView().getHeader().getAppearance().styles().head());
+          int maxWidth = textMetrics.getWidth(gridColumnDef.getHeader()) + 15; // extra is for the dropdown arrow
+          final IGLColumn column = gridColumnDef.getColumn();
+          for (final GLValueMap valueMap : _listStore.getAll()) {
+            final int width = textMetrics.getWidth(valueMap.asString(column)) - 20; // adjust for overage
+            maxWidth = width > maxWidth ? width : maxWidth;
+          }
+          columnConfig.setWidth(maxWidth);
+          if (columnConfig.getCell() instanceof CheckBoxCell) {
+            centerCheckBox(columnConfig);
+          }
+          _grid.getView().refresh(true);
+        }
+      });
+      headerContextMenuEvent.getMenu().add(menuItem);
+    }
+  };
+  _grid.addHeaderContextMenuHandler(headerContextMenuHandler);
 }
 //--------------------------------------------------------------------------------------------------
 @Override
@@ -97,11 +138,11 @@ private ColumnConfig<GLValueMap, Boolean> createColumnConfigBoolean(final GLGrid
   final ColumnConfig<GLValueMap, Boolean> result;
   final ValueProvider<GLValueMap, Boolean> valueProvider;
   valueProvider = new GLBooleanValueProvider(column);
-  result = new ColumnConfig<GLValueMap, Boolean>(valueProvider, gridColumnDef.getWidth(), //
+  result = new ColumnConfig<GLValueMap, Boolean>(valueProvider, gridColumnDef.getWidth(),
                                                  column.getTitle());
   result.setHorizontalAlignment(gridColumnDef.getHorizontalAlignment());
   result.setCell(new CheckBoxCell());
-  centerCheckBox(result);
+  _checkBoxList.add(result);
   return result;
 }
 //--------------------------------------------------------------------------------------------------
@@ -190,13 +231,6 @@ private ColumnModel<GLValueMap> createColumnModel(final GridSelectionModel<GLVal
   result.addColumnWidthChangeHandler(new ColumnWidthChangeHandler() {
     @Override
     public void onColumnWidthChange(final ColumnWidthChangeEvent event) {
-      final GridCell cell = _grid.walkCells(3, 2, 0, new Callback() {
-        @Override
-        public boolean isSelectable(final GridCell cell2) {
-          return true;
-        }
-      });
-      final int width = TextMetrics.get().getWidth("Hello");
       final ColumnConfig<GLValueMap, ?> columnConfig = columnConfigList.get(event.getIndex());
       if (columnConfig.getCell() instanceof CheckBoxCell) {
         centerCheckBox(columnConfig);
@@ -204,6 +238,9 @@ private ColumnModel<GLValueMap> createColumnModel(final GridSelectionModel<GLVal
       }
     }
   });
+  for (final ColumnConfig<GLValueMap, ?> columnConfig : _checkBoxList) {
+    centerCheckBox(columnConfig);
+  }
   return result;
 }
 //--------------------------------------------------------------------------------------------------
@@ -281,7 +318,15 @@ private void createGrid() {
   _grid.setLoadMask(true);
   _grid.setSelectionModel(selectionModel);
   _grid.setView(createGridView());
+  addHeaderContextMenuHandler();
   createEditors();
+}
+//--------------------------------------------------------------------------------------------------
+private void createGridColumnDefMap() {
+  _gridColumnDefMap = new TreeMap<String, GLGridColumnDef>();
+  for (final GLGridColumnDef gridColumnDef : _gridColumnDefList) {
+    _gridColumnDefMap.put(gridColumnDef.getColumn().toString(), gridColumnDef);
+  }
 }
 //--------------------------------------------------------------------------------------------------
 private GridView<GLValueMap> createGridView() {
