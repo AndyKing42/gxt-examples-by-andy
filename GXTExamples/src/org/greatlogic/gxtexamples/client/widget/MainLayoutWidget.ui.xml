@@ -83,31 +83,33 @@
       size='200'/>
   </ui:with>
   <!--===========================================================================================-->
-  <container:BorderLayoutContainer borders='true'>
-    <container:north layoutData='{northData}'>
-      <gxt:ContentPanel headerVisible='false'>
-        <g:Label text='North'/>
-      </gxt:ContentPanel>
-    </container:north>
-    <container:west layoutData='{westData}'>
-      <gxt:ContentPanel headerVisible='false'>
-        <g:Label text='West'/>
-      </gxt:ContentPanel>
-    </container:west>
-    <container:center>
-      <gxt:ContentPanel
-        ui:field='centerPanel'
-        headerVisible='false'/>
-    </container:center>
-    <container:east layoutData='{eastData}'>
-      <gxt:ContentPanel headerVisible='false'>
-        <g:Label text='East'/>
-      </gxt:ContentPanel>
-    </container:east>
-    <container:south layoutData='{southData}'>
-      <gxt:ContentPanel headerVisible='false'>
-        <g:Label text='South'/>
-      </gxt:ContentPanel>
-    </container:south>
-  </container:BorderLayoutContainer>
+  <container:Viewport>
+    <container:BorderLayoutContainer borders='true'>
+      <container:north layoutData='{northData}'>
+        <gxt:ContentPanel headerVisible='false'>
+          <g:Label text='North'/>
+        </gxt:ContentPanel>
+      </container:north>
+      <container:west layoutData='{westData}'>
+        <gxt:ContentPanel headerVisible='false'>
+          <g:Label text='West'/>
+        </gxt:ContentPanel>
+      </container:west>
+      <container:center>
+        <gxt:ContentPanel
+          ui:field='centerPanel'
+          headerVisible='false'/>
+      </container:center>
+      <container:east layoutData='{eastData}'>
+        <gxt:ContentPanel headerVisible='false'>
+          <g:Label text='East'/>
+        </gxt:ContentPanel>
+      </container:east>
+      <container:south layoutData='{southData}'>
+        <gxt:ContentPanel headerVisible='false'>
+          <g:Label text='South'/>
+        </gxt:ContentPanel>
+      </container:south>
+    </container:BorderLayoutContainer>
+  </container:Viewport>
 </ui:UiBinder>

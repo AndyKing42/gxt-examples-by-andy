@@ -31,6 +31,8 @@ import com.sencha.gxt.widget.core.client.event.ColumnWidthChangeEvent;
 import com.sencha.gxt.widget.core.client.event.ColumnWidthChangeEvent.ColumnWidthChangeHandler;
 import com.sencha.gxt.widget.core.client.event.HeaderContextMenuEvent;
 import com.sencha.gxt.widget.core.client.event.HeaderContextMenuEvent.HeaderContextMenuHandler;
+import com.sencha.gxt.widget.core.client.event.HeaderDoubleClickEvent;
+import com.sencha.gxt.widget.core.client.event.HeaderDoubleClickEvent.HeaderDoubleClickHandler;
 import com.sencha.gxt.widget.core.client.event.RefreshEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
@@ -58,6 +60,7 @@ protected ArrayList<GLGridColumnDef>                 _gridColumnDefList;
 private TreeMap<String, GLGridColumnDef>             _gridColumnDefMap;
 protected ListStore<GLValueMap>                      _listStore;
 private final String                                 _noRowsMessage;
+private GridSelectionModel<GLValueMap>               _selectionModel;
 //--------------------------------------------------------------------------------------------------
 protected GLValueMapGridWidget(final String headingText, final String noRowsMessage,
                                final IGLColumn keyColumn) {
@@ -77,24 +80,22 @@ private void addHeaderContextMenuHandler() {
   final HeaderContextMenuHandler headerContextMenuHandler = new HeaderContextMenuHandler() {
     @Override
     public void onHeaderContextMenu(final HeaderContextMenuEvent headerContextMenuEvent) {
-      final MenuItem menuItem = new MenuItem("Size To Fit");
+      MenuItem menuItem = new MenuItem("Size To Fit");
       menuItem.addSelectionHandler(new SelectionHandler<Item>() {
         @Override
         public void onSelection(final SelectionEvent<Item> selectionEvent) {
-          final int columnIndex = headerContextMenuEvent.getColumnIndex();
-          final ColumnConfig<GLValueMap, ?> columnConfig = _grid.getColumnModel().getColumn(columnIndex);
-          final GLGridColumnDef gridColumnDef = _gridColumnDefMap.get(columnConfig.getPath());
-          final TextMetrics textMetrics = TextMetrics.get();
-          textMetrics.bind(_grid.getView().getHeader().getAppearance().styles().head());
-          int maxWidth = textMetrics.getWidth(gridColumnDef.getHeader()) + 15; // extra is for the dropdown arrow
-          final IGLColumn column = gridColumnDef.getColumn();
-          for (final GLValueMap valueMap : _listStore.getAll()) {
-            final int width = textMetrics.getWidth(valueMap.asString(column)) - 20; // adjust for overage
-            maxWidth = width > maxWidth ? width : maxWidth;
-          }
-          columnConfig.setWidth(maxWidth);
-          if (columnConfig.getCell() instanceof CheckBoxCell) {
-            centerCheckBox(columnConfig);
+          resizeColumnToFit(headerContextMenuEvent.getColumnIndex());
+          _grid.getView().refresh(true);
+        }
+      });
+      headerContextMenuEvent.getMenu().add(menuItem);
+      menuItem = new MenuItem("Size All To Fit");
+      menuItem.addSelectionHandler(new SelectionHandler<Item>() {
+        @Override
+        public void onSelection(final SelectionEvent<Item> selectionEvent) {
+          final int startIndex = _selectionModel instanceof CheckBoxSelectionModel ? 1 : 0;
+          for (int columnIndex = startIndex; columnIndex < _grid.getColumnModel().getColumnCount(); ++columnIndex) {
+            resizeColumnToFit(columnIndex);
           }
           _grid.getView().refresh(true);
         }
@@ -105,23 +106,34 @@ private void addHeaderContextMenuHandler() {
   _grid.addHeaderContextMenuHandler(headerContextMenuHandler);
 }
 //--------------------------------------------------------------------------------------------------
+private void addHeaderDoubleClickHandler() {
+  final HeaderDoubleClickHandler headerDoubleClickHandler = new HeaderDoubleClickHandler() {
+    @Override
+    public void onHeaderDoubleClick(final HeaderDoubleClickEvent event) {
+      GLUtil.info(10, "Double click");
+      resizeColumnToFit(event.getColumnIndex());
+      _grid.getView().refresh(true);
+    }
+  };
+  _grid.addHeaderDoubleClickHandler(headerDoubleClickHandler);
+}
+//--------------------------------------------------------------------------------------------------
 @Override
 public Widget asWidget() {
   return _contentPanel;
 }
 //--------------------------------------------------------------------------------------------------
-protected void centerCheckBox(final ColumnConfig<GLValueMap, ?> columnConfig) {
+private void centerCheckBox(final ColumnConfig<GLValueMap, ?> columnConfig) {
   final int leftPadding = (columnConfig.getWidth() - 12) / 2;
   final String styles = "padding: 3px 0px 0px " + leftPadding + "px;";
   final SafeStyles textStyles = SafeStylesUtils.fromTrustedString(styles);
   columnConfig.setColumnTextStyle(textStyles);
 }
 //--------------------------------------------------------------------------------------------------
-private CheckBoxSelectionModel<GLValueMap> createCheckBoxSelectionModel() {
-  CheckBoxSelectionModel<GLValueMap> result;
+private void createCheckBoxSelectionModel() {
   final IdentityValueProvider<GLValueMap> identityValueProvider;
   identityValueProvider = new IdentityValueProvider<GLValueMap>();
-  result = new CheckBoxSelectionModel<GLValueMap>(identityValueProvider) {
+  _selectionModel = new CheckBoxSelectionModel<GLValueMap>(identityValueProvider) {
     @Override
     protected void onRefresh(final RefreshEvent event) {
       if (isSelectAllChecked()) {
@@ -130,7 +142,6 @@ private CheckBoxSelectionModel<GLValueMap> createCheckBoxSelectionModel() {
       super.onRefresh(event);
     }
   };
-  return result;
 }
 //--------------------------------------------------------------------------------------------------
 private ColumnConfig<GLValueMap, Boolean> createColumnConfigBoolean(final GLGridColumnDef gridColumnDef,
@@ -142,6 +153,7 @@ private ColumnConfig<GLValueMap, Boolean> createColumnConfigBoolean(final GLGrid
                                                  column.getTitle());
   result.setHorizontalAlignment(gridColumnDef.getHorizontalAlignment());
   result.setCell(new CheckBoxCell());
+  result.setSortable(false);
   _checkBoxList.add(result);
   return result;
 }
@@ -189,12 +201,12 @@ private ColumnConfig<GLValueMap, String> createColumnConfigString(final GLGridCo
   return result;
 }
 //--------------------------------------------------------------------------------------------------
-private ColumnModel<GLValueMap> createColumnModel(final GridSelectionModel<GLValueMap> selectionModel) {
+private ColumnModel<GLValueMap> createColumnModel() {
   ColumnModel<GLValueMap> result;
   final ArrayList<ColumnConfig<GLValueMap, ?>> columnConfigList;
   columnConfigList = new ArrayList<ColumnConfig<GLValueMap, ?>>();
-  if (selectionModel instanceof CheckBoxSelectionModel) {
-    columnConfigList.add(((CheckBoxSelectionModel<GLValueMap>)selectionModel).getColumn());
+  if (_selectionModel instanceof CheckBoxSelectionModel) {
+    columnConfigList.add(((CheckBoxSelectionModel<GLValueMap>)_selectionModel).getColumn());
   }
   for (final GLGridColumnDef gridColumnDef : _gridColumnDefList) {
     ColumnConfig<GLValueMap, ?> columnConfig = null;
@@ -301,8 +313,8 @@ private void createEditors() {
 }
 //--------------------------------------------------------------------------------------------------
 private void createGrid() {
-  final CheckBoxSelectionModel<GLValueMap> selectionModel = createCheckBoxSelectionModel();
-  final ColumnModel<GLValueMap> columnModel = createColumnModel(selectionModel);
+  createCheckBoxSelectionModel();
+  final ColumnModel<GLValueMap> columnModel = createColumnModel();
   _grid = new Grid<GLValueMap>(_listStore, columnModel);
   _grid.addRowClickHandler(new RowClickEvent.RowClickHandler() {
     @Override
@@ -316,9 +328,10 @@ private void createGrid() {
   _grid.setBorders(true);
   _grid.setColumnReordering(true);
   _grid.setLoadMask(true);
-  _grid.setSelectionModel(selectionModel);
+  _grid.setSelectionModel(_selectionModel);
   _grid.setView(createGridView());
   addHeaderContextMenuHandler();
+  addHeaderDoubleClickHandler();
   createEditors();
 }
 //--------------------------------------------------------------------------------------------------
@@ -343,5 +356,22 @@ public ListStore<GLValueMap> getListStore() {
 }
 //--------------------------------------------------------------------------------------------------
 protected abstract void loadGridColumnDefList();
+//--------------------------------------------------------------------------------------------------
+private void resizeColumnToFit(final int columnIndex) {
+  final ColumnConfig<GLValueMap, ?> columnConfig = _grid.getColumnModel().getColumn(columnIndex);
+  final GLGridColumnDef gridColumnDef = _gridColumnDefMap.get(columnConfig.getPath());
+  final TextMetrics textMetrics = TextMetrics.get();
+  textMetrics.bind(_grid.getView().getHeader().getAppearance().styles().head());
+  int maxWidth = textMetrics.getWidth(gridColumnDef.getHeader()) + 15; // extra is for the dropdown arrow
+  final IGLColumn column = gridColumnDef.getColumn();
+  for (final GLValueMap valueMap : _listStore.getAll()) {
+    final int width = textMetrics.getWidth(valueMap.asString(column)) - 20; // adjust for overage
+    maxWidth = width > maxWidth ? width : maxWidth;
+  }
+  columnConfig.setWidth(maxWidth);
+  if (columnConfig.getCell() instanceof CheckBoxCell) {
+    centerCheckBox(columnConfig);
+  }
+}
 //--------------------------------------------------------------------------------------------------
 }
