@@ -159,9 +159,8 @@ private void createCheckBoxSelectionModel() {
 private ColumnConfig<GLValueMap, Boolean> createColumnConfigBoolean(final GLGridColumnDef gridColumnDef,
                                                                     final IGLColumn column) {
   final ColumnConfig<GLValueMap, Boolean> result;
-  final ValueProvider<GLValueMap, Boolean> valueProvider;
-  valueProvider = new GLBooleanValueProvider(column);
-  result = new ColumnConfig<GLValueMap, Boolean>(valueProvider, gridColumnDef.getWidth(),
+  final ValueProvider<GLValueMap, Boolean> valueProvider = new GLBooleanValueProvider(column);
+  result = new ColumnConfig<GLValueMap, Boolean>(valueProvider, gridColumnDef.getWidth(), //
                                                  column.getTitle());
   result.setHorizontalAlignment(gridColumnDef.getHorizontalAlignment());
   result.setCell(new CheckBoxCell());
@@ -192,8 +191,7 @@ private ColumnConfig<GLValueMap, BigDecimal> createColumnConfigBigDecimal(final 
 private ColumnConfig<GLValueMap, Integer> createColumnConfigInteger(final GLGridColumnDef gridColumnDef,
                                                                     final IGLColumn column) {
   final ColumnConfig<GLValueMap, Integer> result;
-  final ValueProvider<GLValueMap, Integer> valueProvider;
-  valueProvider = new GLIntegerValueProvider(column);
+  final ValueProvider<GLValueMap, Integer> valueProvider = new GLIntegerValueProvider(column);
   result = new ColumnConfig<GLValueMap, Integer>(valueProvider, gridColumnDef.getWidth(), //
                                                  column.getTitle());
   result.setHorizontalAlignment(gridColumnDef.getHorizontalAlignment());
@@ -204,8 +202,7 @@ private ColumnConfig<GLValueMap, Integer> createColumnConfigInteger(final GLGrid
 private ColumnConfig<GLValueMap, String> createColumnConfigString(final GLGridColumnDef gridColumnDef,
                                                                   final IGLColumn column) {
   final ColumnConfig<GLValueMap, String> result;
-  final ValueProvider<GLValueMap, String> valueProvider;
-  valueProvider = new GLStringValueProvider(column);
+  final ValueProvider<GLValueMap, String> valueProvider = new GLStringValueProvider(column);
   result = new ColumnConfig<GLValueMap, String>(valueProvider, gridColumnDef.getWidth(), //
                                                 column.getTitle());
   result.setHorizontalAlignment(gridColumnDef.getHorizontalAlignment());
@@ -374,10 +371,15 @@ private void resizeColumnToFit(final int columnIndex) {
   final GLGridColumnDef gridColumnDef = _gridColumnDefMap.get(columnConfig.getPath());
   final TextMetrics textMetrics = TextMetrics.get();
   textMetrics.bind(_grid.getView().getHeader().getAppearance().styles().head());
-  int maxWidth = textMetrics.getWidth(gridColumnDef.getHeader()) + 15; // extra is for the dropdown arrow
+  int maxWidth = textMetrics.getWidth(columnConfig.getHeader().asString()) + 15; // extra is for the dropdown arrow
   final IGLColumn column = gridColumnDef.getColumn();
   for (final GLValueMap valueMap : _listStore.getAll()) {
-    final int width = textMetrics.getWidth(valueMap.asString(column)) - 20; // adjust for overage
+    final int width = textMetrics.getWidth(valueMap.asString(column)) - 20;
+    maxWidth = width > maxWidth ? width : maxWidth;
+  }
+  for (final Store<GLValueMap>.Record record : _listStore.getModifiedRecords()) {
+    final int width = textMetrics.getWidth(record.getValue(columnConfig.getValueProvider()) //
+                                                 .toString()) - 35;
     maxWidth = width > maxWidth ? width : maxWidth;
   }
   columnConfig.setWidth(maxWidth);
