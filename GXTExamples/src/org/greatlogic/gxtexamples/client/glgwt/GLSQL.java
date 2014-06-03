@@ -22,6 +22,8 @@ import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLJoinType;
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLSQLType;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.sencha.gxt.data.shared.ListStore;
 
 public class GLSQL {
 //--------------------------------------------------------------------------------------------------
@@ -131,6 +133,43 @@ public static GLSQL delete(final IGLTable table, final String dataSourceName) {
  */
 public static GLSQL delete(final String tableName, final String dataSourceName) {
   return new GLSQL(EGLSQLType.Delete, tableName, dataSourceName);
+}
+//--------------------------------------------------------------------------------------------------
+public void execute(final IGLSQLSelectCallback callback) {
+  GLUtil.getRemoteService().select(toXMLSB().toString(), new AsyncCallback<String>() {
+    @Override
+    public void onFailure(final Throwable t) {
+      callback.onFailure(t);
+    }
+    @Override
+    public void onSuccess(final String selectResult) {
+      try {
+        final String[] selectRows = selectResult.split("\n");
+        final ListStore<GLValueMap> listStore = new ListStore<GLValueMap>() ||
+                                                pass_list_store_into_the_execute_callback("?");
+        String[] columnNames = null;
+        boolean firstRow = true;
+        for (final String row : selectRows) {
+          if (firstRow) {
+            columnNames = row.split(",");
+            firstRow = false;
+          }
+          else if (columnNames != null) {
+            final GLValueMap valueMap = new GLValueMap(false);
+            final List<String> columnValueList = GLCSV.extract(row);
+            int columnIndex = 0;
+            for (final String columnName : columnNames) {
+              valueMap.put(columnName, columnValueList.get(columnIndex++));
+            }
+          }
+        }
+        callback.onSuccess(listStore);
+      }
+      catch (final GLCSVException csve) {
+        onFailure(csve);
+      }
+    }
+  });
 }
 //--------------------------------------------------------------------------------------------------
 /**

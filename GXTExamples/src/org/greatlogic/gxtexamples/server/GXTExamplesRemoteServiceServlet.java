@@ -1,5 +1,6 @@
 package org.greatlogic.gxtexamples.server;
 
+import org.apache.commons.lang3.StringUtils;
 import org.greatlogic.gxtexamples.shared.IRemoteService;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.greatlogic.glbase.gldb.GLDBException;
@@ -46,15 +47,10 @@ public String select(final String xmlRequest) {
     final GLSQL sql = GLSQL.selectUsingXML(xml);
     sql.open();
     try {
-      boolean firstRow = true;
+      result.append(StringUtils.join(sql.getColumnNameIterable(), ',')).append('\n');
       while (sql.next(false)) {
-        if (firstRow) {
-          firstRow = false;
-        }
-        else {
-          result.append('\n');
-        }
         sql.getRowAsCSV(result);
+        result.append('\n');
       }
     }
     finally {
@@ -62,10 +58,10 @@ public String select(final String xmlRequest) {
     }
   }
   catch (final GLDBException dbe) {
-
+    GLLog.major("Error executing 'select'", dbe);
   }
   catch (final GLXMLException xmle) {
-
+    GLLog.major("Error processing XML for 'select'", xmle);
   }
   return result.toString();
 }

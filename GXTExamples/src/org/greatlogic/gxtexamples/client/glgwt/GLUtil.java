@@ -15,6 +15,9 @@ package org.greatlogic.gxtexamples.client.glgwt;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Random;
+import org.greatlogic.gxtexamples.shared.IRemoteService;
+import org.greatlogic.gxtexamples.shared.IRemoteServiceAsync;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.sencha.gxt.data.shared.ListStore;
@@ -25,8 +28,9 @@ import com.sencha.gxt.widget.core.client.info.InfoConfig;
 
 public class GLUtil {
 //--------------------------------------------------------------------------------------------------
-private static Random         _random;
-private static DateTimeFormat _yyyymmddDateTimeFormat;
+private static Random              _random;
+private static IRemoteServiceAsync _remoteService;
+private static DateTimeFormat      _yyyymmddDateTimeFormat;
 //--------------------------------------------------------------------------------------------------
 static {
   _random = new Random(System.currentTimeMillis());
@@ -141,11 +145,19 @@ public static int getRandomInt(final int minValue, final int maxValue) {
   return _random.nextInt(maxValue - minValue) + minValue;
 }
 //--------------------------------------------------------------------------------------------------
+public static IRemoteServiceAsync getRemoteService() {
+  return _remoteService;
+}
+//--------------------------------------------------------------------------------------------------
 public static void info(final int seconds, final String message) {
   final InfoConfig infoConfig = new DefaultInfoConfig("", message);
   infoConfig.setDisplay(seconds * 1000);
   final Info info = new Info();
   info.show(infoConfig);
+}
+//--------------------------------------------------------------------------------------------------
+public static void initialize() {
+  _remoteService = GWT.create(IRemoteService.class);
 }
 //--------------------------------------------------------------------------------------------------
 public static boolean isBlank(final CharSequence s) {
@@ -176,9 +188,8 @@ public static boolean stringToBoolean(final CharSequence stringValue, final bool
     result = defaultValue;
   }
   else {
-    result =
-             stringValue.charAt(0) == 'y' || stringValue.charAt(0) == 'Y' ||
-                     stringValue.toString().equalsIgnoreCase("true");
+    result = stringValue.charAt(0) == 'y' || stringValue.charAt(0) == 'Y' ||
+             stringValue.toString().equalsIgnoreCase("true");
   }
   return result;
 }
