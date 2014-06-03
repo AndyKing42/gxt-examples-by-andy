@@ -1,9 +1,10 @@
 package org.greatlogic.gxtexamples.client.glgwt;
 
-
-public interface IGLSQLSelectCallback {
+@SuppressWarnings("serial")
+public class GLInvalidFieldOrColumnException extends Exception {
 //--------------------------------------------------------------------------------------------------
-public void onFailure(final Throwable t);
-public void onSuccess(final GLListStore listStore);
+public GLInvalidFieldOrColumnException(final String fieldName) {
+  super(fieldName);
+}
 //--------------------------------------------------------------------------------------------------
 }

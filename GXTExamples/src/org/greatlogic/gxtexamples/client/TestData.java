@@ -12,11 +12,14 @@ package org.greatlogic.gxtexamples.client;
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+import java.util.ArrayList;
+import org.greatlogic.gxtexamples.client.glgwt.GLListStore;
+import org.greatlogic.gxtexamples.client.glgwt.GLRecord;
+import org.greatlogic.gxtexamples.client.glgwt.GLRecordDef;
 import org.greatlogic.gxtexamples.client.glgwt.GLUtil;
-import org.greatlogic.gxtexamples.client.glgwt.GLValueMap;
+import org.greatlogic.gxtexamples.client.glgwt.IGLColumn;
 import org.greatlogic.gxtexamples.shared.IDBEnums.Pet;
 import org.greatlogic.gxtexamples.shared.IDBEnums.PetType;
-import com.sencha.gxt.data.shared.ListStore;
 
 public class TestData {
 //--------------------------------------------------------------------------------------------------
@@ -34,7 +37,10 @@ private static final String[] PetNamesAndSex = new String[] {"Angel,F", "Ashley,
     "Sebastian,M", "Sheba,F", "Simba,M", "Snowball,U", "Socks,U", "Sophia,F", "Sophie,F",
     "Spencer,M", "Sunny,F", "Sylvester,M", "Taz,M", "Thomas,M", "Tinkerbell,F", "Toby,M",
     "Tommy,M", "Tucker,M", "Winston,M", "Ziggy,M", "Zoe,F", "Zoey,F"};
-public static void loadPetTestData(final ListStore<GLValueMap> listStore) {
+public static void loadPetTestData(final GLListStore listStore) {
+  final IGLColumn[] columns = new IGLColumn[] {Pet.AdoptionFee, Pet.FosterDate, Pet.IntakeDate, //
+      Pet.PetId, Pet.PetName, Pet.PetTypeId, Pet.Sex, Pet.TrainedFlag};
+  final GLRecordDef recordDef = new GLRecordDef(columns, Pet.PetId);
   listStore.clear();
   int nextPetId = 1;
   for (final String petNameAndSex : PetNamesAndSex) {
@@ -44,31 +50,36 @@ public static void loadPetTestData(final ListStore<GLValueMap> listStore) {
     final int minute = GLUtil.getRandomInt(4) * 15;
     final String intakeTime = (hour < 10 ? "0" : "") + hour + (minute < 10 ? "0" : "") + minute;
     final String fosterDate = GLUtil.dateAddDays(intakeDate, 60);
-    final GLValueMap valueMap = new GLValueMap(false);
-    valueMap.put(Pet.AdoptionFee, GLUtil.getRandomInt(3000, 10000) / 100.0);
-    valueMap.put(Pet.FosterDate, fosterDate);
-    valueMap.put(Pet.IntakeDate, intakeDate + intakeTime);
-    valueMap.put(Pet.PetId, nextPetId);
-    valueMap.put(Pet.PetName, nameAndSex[0]);
-    valueMap.put(Pet.PetTypeId, GLUtil.getRandomInt(PetTypes.length) + 1);
-    valueMap.put(Pet.Sex, nameAndSex[1]);
-    valueMap.put(Pet.TrainedFlag, GLUtil.getRandomInt(2) == 0 ? "Y" : "N");
-    listStore.add(valueMap);
+    final ArrayList<Object> valueList = new ArrayList<Object>(columns.length);
+    valueList.add(GLUtil.getRandomInt(3000, 10000) / 100.0);
+    valueList.add(fosterDate);
+    valueList.add(intakeDate + intakeTime);
+    valueList.add(nextPetId);
+    valueList.add(nameAndSex[0]);
+    valueList.add(GLUtil.getRandomInt(PetTypes.length) + 1);
+    valueList.add(nameAndSex[1]);
+    valueList.add(GLUtil.getRandomInt(2) == 0 ? "Y" : "N");
+    final GLRecord record = new GLRecord(recordDef, valueList);
+    listStore.add(record);
     ++nextPetId;
   }
 }
 //--------------------------------------------------------------------------------------------------
 private static final String[] PetTypes = new String[] {"Cat,Cat", "Dog,Dog"};
-public static void loadPetTypeTestData(final ListStore<GLValueMap> listStore) {
+public static void loadPetTypeTestData(final GLListStore listStore) {
+  final IGLColumn[] columns = new IGLColumn[] {PetType.PetTypeCode, PetType.PetTypeDesc, //
+      PetType.PetTypeId};
+  final GLRecordDef recordDef = new GLRecordDef(columns, PetType.PetTypeId);
   listStore.clear();
   int nextPetTypeId = 1;
   for (final String petType : PetTypes) {
     final String[] petTypeFields = petType.split(",");
-    final GLValueMap valueMap = new GLValueMap(false);
-    valueMap.put(PetType.PetTypeCode, petTypeFields[0]);
-    valueMap.put(PetType.PetTypeDesc, petTypeFields[1]);
-    valueMap.put(PetType.PetTypeId, nextPetTypeId);
-    listStore.add(valueMap);
+    final ArrayList<Object> valueList = new ArrayList<Object>(columns.length);
+    valueList.add(petTypeFields[0]);
+    valueList.add(petTypeFields[1]);
+    valueList.add(nextPetTypeId);
+    final GLRecord record = new GLRecord(recordDef, valueList);
+    listStore.add(record);
     ++nextPetTypeId;
   }
 }

@@ -13,15 +13,15 @@ package org.greatlogic.gxtexamples.client.widget;
  * the License.
  */
 import java.util.TreeMap;
-import org.greatlogic.gxtexamples.client.glgwt.GLValueMapGridWidget;
+import org.greatlogic.gxtexamples.client.glgwt.GLGridWidget;
 
 public class GridWidgetManager {
 //--------------------------------------------------------------------------------------------------
-private static TreeMap<String, GLValueMapGridWidget> _gridWidgetMap; // grid name -> GLValueMapGridWidget
+private static TreeMap<String, GLGridWidget> _gridWidgetMap; // grid name -> GLValueMapGridWidget
 
 //--------------------------------------------------------------------------------------------------
 static {
-  _gridWidgetMap = new TreeMap<String, GLValueMapGridWidget>();
+  _gridWidgetMap = new TreeMap<String, GLGridWidget>();
 }
 //--------------------------------------------------------------------------------------------------
 public static PetGridWidget getPetGrid(final String gridName) {

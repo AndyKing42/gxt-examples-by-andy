@@ -12,8 +12,8 @@ package org.greatlogic.gxtexamples.client.glgwt;
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.TreeMap;
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLDBConj;
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLDBException;
@@ -23,25 +23,25 @@ import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLSQLType;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.sencha.gxt.data.shared.ListStore;
 
 public class GLSQL {
 //--------------------------------------------------------------------------------------------------
-private static final String           CloseParens = "))))))))))";
-private static final String           OpenParens  = "((((((((((";
+private static final String            CloseParens = "))))))))))";
+private static final String            OpenParens  = "((((((((((";
 
-private final TreeMap<String, String> _columnMap;                // column names (insert/select/update) and values (insert/update)
-private String                        _dataSourceName;
-private String                        _fromHint;
-private List<String>                  _groupByList;
-private boolean                       _ignoreDuplicates;
-private List<GLJoinDef>               _joinDefList;
-private int                           _maxNumberOfRows;
-private String                        _orderByClause;
-private final EGLSQLType              _sqlType;
-private IGLTable                      _table;
-private String                        _tableName;
-private final List<GLWhereClause>     _whereClauseList;
+private final TreeMap<String, String>  _columnMap;                // column names (insert/select/update) and values (insert/update)
+private String                         _dataSourceName;
+private String                         _fromHint;
+private ArrayList<String>              _groupByList;
+private boolean                        _ignoreDuplicates;
+private ArrayList<GLJoinDef>           _joinDefList;
+private IGLColumn                      _keyColumn;
+private int                            _maxNumberOfRows;
+private String                         _orderByClause;
+private final EGLSQLType               _sqlType;
+private IGLTable                       _table;
+private String                         _tableName;
+private final ArrayList<GLWhereClause> _whereClauseList;
 //==================================================================================================
 private static class GLJoinDef {
 private final CharSequence _condition;
@@ -135,43 +135,6 @@ public static GLSQL delete(final String tableName, final String dataSourceName) 
   return new GLSQL(EGLSQLType.Delete, tableName, dataSourceName);
 }
 //--------------------------------------------------------------------------------------------------
-public void execute(final IGLSQLSelectCallback callback) {
-  GLUtil.getRemoteService().select(toXMLSB().toString(), new AsyncCallback<String>() {
-    @Override
-    public void onFailure(final Throwable t) {
-      callback.onFailure(t);
-    }
-    @Override
-    public void onSuccess(final String selectResult) {
-      try {
-        final String[] selectRows = selectResult.split("\n");
-        final ListStore<GLValueMap> listStore = new ListStore<GLValueMap>() ||
-                                                pass_list_store_into_the_execute_callback("?");
-        String[] columnNames = null;
-        boolean firstRow = true;
-        for (final String row : selectRows) {
-          if (firstRow) {
-            columnNames = row.split(",");
-            firstRow = false;
-          }
-          else if (columnNames != null) {
-            final GLValueMap valueMap = new GLValueMap(false);
-            final List<String> columnValueList = GLCSV.extract(row);
-            int columnIndex = 0;
-            for (final String columnName : columnNames) {
-              valueMap.put(columnName, columnValueList.get(columnIndex++));
-            }
-          }
-        }
-        callback.onSuccess(listStore);
-      }
-      catch (final GLCSVException csve) {
-        onFailure(csve);
-      }
-    }
-  });
-}
-//--------------------------------------------------------------------------------------------------
 /**
  * Returns a GLSQL object that can be used to insert data into the default data source.
  * @param table The table that is the target of the insert.
@@ -227,20 +190,23 @@ public static GLSQL insert(final String tableName, final String dataSourceName,
 /**
  * Returns a GLSQL object that can be used for constructing a "select" statement against the default
  * data source.
+ * @param keyColumn The column that will be used as the unique identifier for the results.
  * @return A GLSQL object that can be used for constructing a "select" statement.
  */
-public static GLSQL select() {
-  return GLSQL.select((String)null);
+public static GLSQL select(final IGLColumn keyColumn) {
+  return GLSQL.select(keyColumn, (String)null);
 }
 //--------------------------------------------------------------------------------------------------
 /**
  * Returns a GLSQL object that can be used for constructing a "select" statement.
+ * @param keyColumn The column that will be used as the unique identifier for the results.
  * @param firstColumn A column that will be selected.
  * @param columns Additional columns that will be selected.
  * @return A GLSQL object that can be used for constructing a "select" statement.
  */
-public static GLSQL select(final IGLColumn firstColumn, final IGLColumn... columns) {
-  final GLSQL result = GLSQL.select(firstColumn.toString());
+public static GLSQL select(final IGLColumn keyColumn, final IGLColumn firstColumn,
+                           final IGLColumn... columns) {
+  final GLSQL result = GLSQL.select(keyColumn, firstColumn.toString());
   if (columns != null) {
     for (final IGLColumn column : columns) {
       result.selectColumns(column.toString());
@@ -251,20 +217,28 @@ public static GLSQL select(final IGLColumn firstColumn, final IGLColumn... colum
 //--------------------------------------------------------------------------------------------------
 /**
  * Returns a GLSQL object that can be used for constructing a "select" statement.
+ * @param keyColumn The column that will be used as the unique identifier for the results.
  * @param columnSQL The SQL for the columns to be selected.
  * @return A GLSQL object that can be used for constructing a "select" statement.
  */
-public static GLSQL select(final String... columnSQL) {
-  return new GLSQL(EGLSQLType.Select, (IGLTable)null, null).selectColumns(columnSQL);
+public static GLSQL select(final IGLColumn keyColumn, final String... columnSQL) {
+  final GLSQL result = new GLSQL(EGLSQLType.Select, (IGLTable)null, null);
+  result.setKeyColumn(keyColumn);
+  result.selectColumns(columnSQL);
+  return result;
 }
 //--------------------------------------------------------------------------------------------------
 /**
  * Returns a GLSQL object that can be used for constructing a "select" statement.
+ * @param keyColumn The column that will be used as the unique identifier for the results.
  * @param columnCollection The columns to be selected.
  * @return A GLSQL object that can be used for constructing a "select" statement.
  */
-public static GLSQL select(final Collection<String> columnCollection) {
-  return new GLSQL(EGLSQLType.Select, (IGLTable)null, null).selectColumns(columnCollection);
+public static GLSQL select(final IGLColumn keyColumn, final Collection<String> columnCollection) {
+  final GLSQL result = new GLSQL(EGLSQLType.Select, (IGLTable)null, null);
+  result.setKeyColumn(keyColumn);
+  result.selectColumns(columnCollection);
+  return result;
 }
 //--------------------------------------------------------------------------------------------------
 /**
@@ -349,6 +323,38 @@ private void ensureSQLTypeIn(final EGLSQLType... sqlTypes) throws GLDBException 
   if (!sqlTypeFound) {
     throw new GLDBException(EGLDBException.InvalidSQLRequest);
   }
+}
+//--------------------------------------------------------------------------------------------------
+public void execute(final IGLSQLSelectCallback callback) {
+  GLUtil.getRemoteService().select(toXMLSB().toString(), new AsyncCallback<String>() {
+    @Override
+    public void onFailure(final Throwable t) {
+      callback.onFailure(t);
+    }
+    @Override
+    public void onSuccess(final String selectResult) {
+      try {
+        final GLListStore listStore = new GLListStore();
+        final String[] selectRows = selectResult.split("\n");
+        GLRecordDef recordDef;
+        final String[] columnNames = null;
+        boolean firstRow = true;
+        for (final String row : selectRows) {
+          if (firstRow) {
+            recordDef = new GLRecordDef(row.split(","), _keyColumn);
+            firstRow = false;
+          }
+          else if (columnNames != null) {
+            final GLRecord record = new GLRecord(recordDef, (ArrayList)GLCSV.extract(row));
+          }
+        }
+        callback.onSuccess(listStore);
+      }
+      catch (final GLCSVException csve) {
+        onFailure(csve);
+      }
+    }
+  });
 }
 //--------------------------------------------------------------------------------------------------
 /**
@@ -545,6 +551,10 @@ public GLSQL selectColumns(final Collection<String> columnCollection) {
     }
   }
   return this;
+}
+//--------------------------------------------------------------------------------------------------
+private void setKeyColumn(final IGLColumn keyColumn) {
+  _keyColumn = keyColumn;
 }
 //--------------------------------------------------------------------------------------------------
 /**

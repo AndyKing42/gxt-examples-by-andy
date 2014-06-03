@@ -13,21 +13,19 @@ package org.greatlogic.gxtexamples.client;
  * the License.
  */
 import org.greatlogic.gxtexamples.client.glgwt.GLDBException;
+import org.greatlogic.gxtexamples.client.glgwt.GLGridWidget;
+import org.greatlogic.gxtexamples.client.glgwt.GLListStore;
 import org.greatlogic.gxtexamples.client.glgwt.GLSQL;
 import org.greatlogic.gxtexamples.client.glgwt.GLUtil;
-import org.greatlogic.gxtexamples.client.glgwt.GLValueMap;
-import org.greatlogic.gxtexamples.client.glgwt.GLValueMapGridWidget;
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLDBOp;
 import org.greatlogic.gxtexamples.client.glgwt.IGLSQLSelectCallback;
 import org.greatlogic.gxtexamples.client.widget.GridWidgetManager;
 import org.greatlogic.gxtexamples.client.widget.MainLayoutWidget;
 import org.greatlogic.gxtexamples.shared.IDBEnums.EGXTExamplesTable;
 import org.greatlogic.gxtexamples.shared.IDBEnums.Pet;
-import org.greatlogic.gxtexamples.shared.IDBEnums.PetType;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.box.MessageBox;
 
 public class GXTExamples implements EntryPoint {
@@ -44,7 +42,7 @@ private void loadPets() {
 
       }
       @Override
-      public void onSuccess(final ListStore<GLValueMap> listStore) {
+      public void onSuccess(final GLListStore listStore) {
 
       }
     });
@@ -73,9 +71,9 @@ public void onModuleLoad() {
   GLUtil.initialize();
   final MainLayoutWidget mainLayoutWidget = new MainLayoutWidget();
   final boolean loadTestData = true;
-  final GLValueMapGridWidget gridWidget = GridWidgetManager.getPetGrid("Main");
+  final GLGridWidget gridWidget = GridWidgetManager.getPetGrid("Main");
   if (loadTestData) {
-    final ListStore<GLValueMap> petTypeListStore = GLUtil.createListStore(PetType.PetTypeId);
+    final GLListStore petTypeListStore = new GLListStore();
     TestData.loadPetTypeTestData(petTypeListStore);
     TestData.loadPetTestData(gridWidget.getListStore());
   }

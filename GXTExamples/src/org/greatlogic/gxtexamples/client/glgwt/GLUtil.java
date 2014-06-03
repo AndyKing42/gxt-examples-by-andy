@@ -20,8 +20,6 @@ import org.greatlogic.gxtexamples.shared.IRemoteServiceAsync;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
-import com.sencha.gxt.data.shared.ListStore;
-import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.widget.core.client.info.DefaultInfoConfig;
 import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.info.InfoConfig;
@@ -35,16 +33,6 @@ private static DateTimeFormat      _yyyymmddDateTimeFormat;
 static {
   _random = new Random(System.currentTimeMillis());
   _yyyymmddDateTimeFormat = DateTimeFormat.getFormat("yyyyMMdd");
-}
-//--------------------------------------------------------------------------------------------------
-public static ListStore<GLValueMap> createListStore(final IGLColumn keyColumn) {
-  final ModelKeyProvider<GLValueMap> modelKeyProvider = new ModelKeyProvider<GLValueMap>() {
-    @Override
-    public String getKey(final GLValueMap valueMap) {
-      return valueMap.asString(keyColumn);
-    }
-  };
-  return new ListStore<GLValueMap>(modelKeyProvider);
 }
 //--------------------------------------------------------------------------------------------------
 public static String dateAddDays(final String originalDate, final int numberOfDays) {
@@ -188,8 +176,9 @@ public static boolean stringToBoolean(final CharSequence stringValue, final bool
     result = defaultValue;
   }
   else {
-    result = stringValue.charAt(0) == 'y' || stringValue.charAt(0) == 'Y' ||
-             stringValue.toString().equalsIgnoreCase("true");
+    result =
+             stringValue.charAt(0) == 'y' || stringValue.charAt(0) == 'Y' ||
+                     stringValue.toString().equalsIgnoreCase("true");
   }
   return result;
 }

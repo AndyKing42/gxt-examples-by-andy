@@ -13,13 +13,13 @@ package org.greatlogic.gxtexamples.client.widget;
  * the License.
  */
 import org.greatlogic.gxtexamples.client.glgwt.GLGridColumnDef;
-import org.greatlogic.gxtexamples.client.glgwt.GLValueMapGridWidget;
+import org.greatlogic.gxtexamples.client.glgwt.GLGridWidget;
 import org.greatlogic.gxtexamples.shared.IDBEnums.Pet;
 
-public class PetGridWidget extends GLValueMapGridWidget {
+public class PetGridWidget extends GLGridWidget {
 //--------------------------------------------------------------------------------------------------
 public PetGridWidget() {
-  super(null, null, Pet.PetId);
+  super(null, null);
 }
 //--------------------------------------------------------------------------------------------------
 @Override

@@ -18,7 +18,7 @@ import com.sencha.gxt.core.client.ValueProvider;
 
 abstract class GLValueProviderClasses {
 //==================================================================================================
-public static class GLBigDecimalValueProvider implements ValueProvider<GLValueMap, BigDecimal> {
+public static class GLBigDecimalValueProvider implements ValueProvider<GLRecord, BigDecimal> {
 private final IGLColumn _column;
 private final int       _numberOfDecimalPlaces;
 public GLBigDecimalValueProvider(final IGLColumn column, final int numberOfDecimalPlaces) {
@@ -26,12 +26,22 @@ public GLBigDecimalValueProvider(final IGLColumn column, final int numberOfDecim
   _numberOfDecimalPlaces = numberOfDecimalPlaces;
 }
 @Override
-public BigDecimal getValue(final GLValueMap valueMap) {
-  return valueMap.asDec(_column);
+public BigDecimal getValue(final GLRecord record) {
+  try {
+    return record.asDec(_column);
+  }
+  catch (final GLInvalidFieldOrColumnException ifoce) {
+    return BigDecimal.ZERO;
+  }
 }
 @Override
-public void setValue(final GLValueMap valueMap, final BigDecimal value) {
-  valueMap.put(_column, value.setScale(_numberOfDecimalPlaces, RoundingMode.HALF_UP));
+public void setValue(final GLRecord record, final BigDecimal value) {
+  try {
+    record.put(_column, value.setScale(_numberOfDecimalPlaces, RoundingMode.HALF_UP));
+  }
+  catch (final GLInvalidFieldOrColumnException ifoce) {
+    //
+  }
 }
 @Override
 public String getPath() {
@@ -39,18 +49,28 @@ public String getPath() {
 }
 }
 //==================================================================================================
-public static class GLBooleanValueProvider implements ValueProvider<GLValueMap, Boolean> {
+public static class GLBooleanValueProvider implements ValueProvider<GLRecord, Boolean> {
 private final IGLColumn _column;
 public GLBooleanValueProvider(final IGLColumn column) {
   _column = column;
 }
 @Override
-public Boolean getValue(final GLValueMap valueMap) {
-  return valueMap.asBoolean(_column);
+public Boolean getValue(final GLRecord record) {
+  try {
+    return record.asBoolean(_column);
+  }
+  catch (final GLInvalidFieldOrColumnException ifoce) {
+    return false;
+  }
 }
 @Override
-public void setValue(final GLValueMap valueMap, final Boolean value) {
-  valueMap.put(_column, value);
+public void setValue(final GLRecord record, final Boolean value) {
+  try {
+    record.put(_column, value);
+  }
+  catch (final GLInvalidFieldOrColumnException ifoce) {
+    //
+  }
 }
 @Override
 public String getPath() {
@@ -58,18 +78,28 @@ public String getPath() {
 }
 }
 //==================================================================================================
-public static class GLIntegerValueProvider implements ValueProvider<GLValueMap, Integer> {
+public static class GLIntegerValueProvider implements ValueProvider<GLRecord, Integer> {
 private final IGLColumn _column;
 public GLIntegerValueProvider(final IGLColumn column) {
   _column = column;
 }
 @Override
-public Integer getValue(final GLValueMap valueMap) {
-  return valueMap.asInt(_column);
+public Integer getValue(final GLRecord record) {
+  try {
+    return record.asInt(_column);
+  }
+  catch (final GLInvalidFieldOrColumnException ifoce) {
+    return 0;
+  }
 }
 @Override
-public void setValue(final GLValueMap valueMap, final Integer value) {
-  valueMap.put(_column, value);
+public void setValue(final GLRecord record, final Integer value) {
+  try {
+    record.put(_column, value);
+  }
+  catch (final GLInvalidFieldOrColumnException ifoce) {
+    //
+  }
 }
 @Override
 public String getPath() {
@@ -77,18 +107,28 @@ public String getPath() {
 }
 }
 //==================================================================================================
-public static class GLStringValueProvider implements ValueProvider<GLValueMap, String> {
+public static class GLStringValueProvider implements ValueProvider<GLRecord, String> {
 private final IGLColumn _column;
 public GLStringValueProvider(final IGLColumn column) {
   _column = column;
 }
 @Override
-public String getValue(final GLValueMap valueMap) {
-  return valueMap.asString(_column);
+public String getValue(final GLRecord record) {
+  try {
+    return record.asString(_column);
+  }
+  catch (final GLInvalidFieldOrColumnException ifoce) {
+    return "";
+  }
 }
 @Override
-public void setValue(final GLValueMap valueMap, final String value) {
-  valueMap.put(_column, value);
+public void setValue(final GLRecord record, final String value) {
+  try {
+    record.put(_column, value);
+  }
+  catch (final GLInvalidFieldOrColumnException ifoce) {
+    //
+  }
 }
 @Override
 public String getPath() {

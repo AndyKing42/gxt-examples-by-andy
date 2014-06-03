@@ -8,7 +8,7 @@ import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 public class GLGridColumnDef {
 //--------------------------------------------------------------------------------------------------
 private final IGLColumn                   _column;
-private ColumnConfig<GLValueMap, ?>       _columnConfig;
+private ColumnConfig<GLRecord, ?>         _columnConfig;
 private int                               _columnIndex;
 private final String                      _header;
 private final HorizontalAlignmentConstant _horizontalAlignment;
@@ -35,7 +35,7 @@ public IGLColumn getColumn() {
   return _column;
 }
 //--------------------------------------------------------------------------------------------------
-public ColumnConfig<GLValueMap, ?> getColumnConfig() {
+public ColumnConfig<GLRecord, ?> getColumnConfig() {
   return _columnConfig;
 }
 //--------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ public int getWidth() {
   return _width;
 }
 //--------------------------------------------------------------------------------------------------
-public void setColumnConfig(final ColumnConfig<GLValueMap, ?> columnConfig, final int columnIndex) {
+public void setColumnConfig(final ColumnConfig<GLRecord, ?> columnConfig, final int columnIndex) {
   _columnConfig = columnConfig;
   _columnIndex = columnIndex;
 }

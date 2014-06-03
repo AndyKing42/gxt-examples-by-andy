@@ -13,7 +13,6 @@ package org.greatlogic.gxtexamples.client.glgwt;
  * the License.
  */
 import java.util.ArrayList;
-import java.util.List;
 
 public class GLCSV {
 //--------------------------------------------------------------------------------------------------
@@ -79,17 +78,17 @@ public static StringBuilder buildCSV(final StringBuilder sb,
 /**
  * Extracts a string in CSV format into a list of strings.
  */
-public static List<String> extract(final String csv) throws GLCSVException {
+public static ArrayList<String> extract(final String csv) throws GLCSVException {
   return extract(null, csv, DefaultSeparator, DefaultDelimiter);
 } // extract()
 //--------------------------------------------------------------------------------------------------
 /**
  * Extracts a string in CSV format into a list of strings.
  */
-public static List<String> extract(final List<String> origList, final String csv,
-                                   final char separator, final char delimiter)
+public static ArrayList<String> extract(final ArrayList<String> origList, final String csv,
+                                        final char separator, final char delimiter)
   throws GLCSVException {
-  final List<String> result = origList == null ? new ArrayList<String>() : origList;
+  final ArrayList<String> result = origList == null ? new ArrayList<String>() : origList;
   result.clear();
   int beginIndex = 0;
   while (beginIndex < csv.length()) {
