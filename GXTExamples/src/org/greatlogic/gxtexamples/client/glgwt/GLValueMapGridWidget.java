@@ -378,8 +378,7 @@ private void resizeColumnToFit(final int columnIndex) {
     maxWidth = width > maxWidth ? width : maxWidth;
   }
   for (final Store<GLValueMap>.Record record : _listStore.getModifiedRecords()) {
-    final int width = textMetrics.getWidth(record.getValue(columnConfig.getValueProvider()) //
-                                                 .toString()) - 35;
+    final int width = textMetrics.getWidth(record.getValue(columnConfig.getValueProvider()).toString()) - 20;
     maxWidth = width > maxWidth ? width : maxWidth;
   }
   columnConfig.setWidth(maxWidth);
