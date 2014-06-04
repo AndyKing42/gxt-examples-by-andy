@@ -37,4 +37,9 @@ public int getNumberOfFields() {
   return _fieldIndexByFieldNameMap.size();
 }
 //--------------------------------------------------------------------------------------------------
+@Override
+public String toString() {
+  return "Key:" + _keyFieldName + " Columns:" + _fieldIndexByFieldNameMap.keySet();
+}
+//--------------------------------------------------------------------------------------------------
 }

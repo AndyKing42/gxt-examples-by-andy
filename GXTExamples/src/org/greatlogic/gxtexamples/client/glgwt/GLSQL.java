@@ -190,23 +190,20 @@ public static GLSQL insert(final String tableName, final String dataSourceName,
 /**
  * Returns a GLSQL object that can be used for constructing a "select" statement against the default
  * data source.
- * @param keyColumn The column that will be used as the unique identifier for the results.
  * @return A GLSQL object that can be used for constructing a "select" statement.
  */
-public static GLSQL select(final IGLColumn keyColumn) {
-  return GLSQL.select(keyColumn, (String)null);
+public static GLSQL select() {
+  return GLSQL.select((String)null);
 }
 //--------------------------------------------------------------------------------------------------
 /**
  * Returns a GLSQL object that can be used for constructing a "select" statement.
- * @param keyColumn The column that will be used as the unique identifier for the results.
  * @param firstColumn A column that will be selected.
  * @param columns Additional columns that will be selected.
  * @return A GLSQL object that can be used for constructing a "select" statement.
  */
-public static GLSQL select(final IGLColumn keyColumn, final IGLColumn firstColumn,
-                           final IGLColumn... columns) {
-  final GLSQL result = GLSQL.select(keyColumn, firstColumn.toString());
+public static GLSQL select(final IGLColumn firstColumn, final IGLColumn... columns) {
+  final GLSQL result = GLSQL.select(firstColumn.toString());
   if (columns != null) {
     for (final IGLColumn column : columns) {
       result.selectColumns(column.toString());
@@ -217,26 +214,22 @@ public static GLSQL select(final IGLColumn keyColumn, final IGLColumn firstColum
 //--------------------------------------------------------------------------------------------------
 /**
  * Returns a GLSQL object that can be used for constructing a "select" statement.
- * @param keyColumn The column that will be used as the unique identifier for the results.
  * @param columnSQL The SQL for the columns to be selected.
  * @return A GLSQL object that can be used for constructing a "select" statement.
  */
-public static GLSQL select(final IGLColumn keyColumn, final String... columnSQL) {
+public static GLSQL select(final String... columnSQL) {
   final GLSQL result = new GLSQL(EGLSQLType.Select, (IGLTable)null, null);
-  result.setKeyColumn(keyColumn);
   result.selectColumns(columnSQL);
   return result;
 }
 //--------------------------------------------------------------------------------------------------
 /**
  * Returns a GLSQL object that can be used for constructing a "select" statement.
- * @param keyColumn The column that will be used as the unique identifier for the results.
  * @param columnCollection The columns to be selected.
  * @return A GLSQL object that can be used for constructing a "select" statement.
  */
-public static GLSQL select(final IGLColumn keyColumn, final Collection<String> columnCollection) {
+public static GLSQL select(final Collection<String> columnCollection) {
   final GLSQL result = new GLSQL(EGLSQLType.Select, (IGLTable)null, null);
-  result.setKeyColumn(keyColumn);
   result.selectColumns(columnCollection);
   return result;
 }
@@ -325,7 +318,7 @@ private void ensureSQLTypeIn(final EGLSQLType... sqlTypes) throws GLDBException 
   }
 }
 //--------------------------------------------------------------------------------------------------
-public void execute(final IGLSQLSelectCallback callback) {
+public void execute(final GLListStore listStore, final IGLSQLSelectCallback callback) {
   GLUtil.getRemoteService().select(toXMLSB().toString(), new AsyncCallback<String>() {
     @Override
     public void onFailure(final Throwable t) {
@@ -334,18 +327,19 @@ public void execute(final IGLSQLSelectCallback callback) {
     @Override
     public void onSuccess(final String selectResult) {
       try {
-        final GLListStore listStore = new GLListStore();
+        listStore.clear();
         final String[] selectRows = selectResult.split("\n");
-        GLRecordDef recordDef;
-        final String[] columnNames = null;
+        GLRecordDef recordDef = null;
         boolean firstRow = true;
         for (final String row : selectRows) {
           if (firstRow) {
             recordDef = new GLRecordDef(row.split(","), _keyColumn);
+            GLUtil.info(10, recordDef.toString());
             firstRow = false;
           }
-          else if (columnNames != null) {
+          else {
             final GLRecord record = new GLRecord(recordDef, (ArrayList)GLCSV.extract(row));
+            listStore.add(record);
           }
         }
         callback.onSuccess(listStore);
@@ -359,33 +353,11 @@ public void execute(final IGLSQLSelectCallback callback) {
 //--------------------------------------------------------------------------------------------------
 /**
  * Adds the table for the "from" clause to a "select" statement.
- * @param tableName The table that is to be used in the "select" statement.
- * @return The GLSQL object.
- */
-public GLSQL from(final String tableName) throws GLDBException {
-  return from(tableName, null);
-}
-//--------------------------------------------------------------------------------------------------
-/**
- * Adds the table for the "from" clause to a "select" statement.
  * @param table The table that is to be used in the "select" statement.
  * @return The GLSQL object.
  */
 public GLSQL from(final IGLTable table) throws GLDBException {
   return from(table, null);
-}
-//--------------------------------------------------------------------------------------------------
-/**
- * Adds the table for the "from" clause to a "select" statement.
- * @param tableName The table that is to be used in the "select" statement.
- * @param dataSourceName The data source name for this query. If this is null then the default data
- * source will be used.
- * @return The GLSQL object.
- */
-public GLSQL from(final String tableName, final String dataSourceName) throws GLDBException {
-  ensureSQLTypeIn(EGLSQLType.Select);
-  setTableName(tableName, dataSourceName);
-  return this;
 }
 //--------------------------------------------------------------------------------------------------
 /**
@@ -398,6 +370,7 @@ public GLSQL from(final String tableName, final String dataSourceName) throws GL
 public GLSQL from(final IGLTable table, final String dataSourceName) throws GLDBException {
   ensureSQLTypeIn(EGLSQLType.Select);
   setTable(table, dataSourceName);
+  setKeyColumn(table.getPrimaryKeyColumn());
   return this;
 }
 //--------------------------------------------------------------------------------------------------

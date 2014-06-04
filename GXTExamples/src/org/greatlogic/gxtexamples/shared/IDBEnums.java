@@ -7,8 +7,16 @@ import org.greatlogic.gxtexamples.client.glgwt.IGLTable;
 public interface IDBEnums {
 //--------------------------------------------------------------------------------------------------
 public enum EGXTExamplesTable implements IGLTable {
-Pet,
-PetType
+Pet(IDBEnums.Pet.PetId),
+PetType(IDBEnums.PetType.PetTypeId);
+private final IGLColumn _primaryKeyColumn;
+private EGXTExamplesTable(final IGLColumn primaryKeyColumn) {
+  _primaryKeyColumn = primaryKeyColumn;
+}
+@Override
+public IGLColumn getPrimaryKeyColumn() {
+  return _primaryKeyColumn;
+}
 }
 //--------------------------------------------------------------------------------------------------
 public enum Pet implements IGLColumn {

@@ -14,4 +14,6 @@ package org.greatlogic.gxtexamples.client.glgwt;
  */
 public interface IGLTable {
 //--------------------------------------------------------------------------------------------------
+public IGLColumn getPrimaryKeyColumn();
+//--------------------------------------------------------------------------------------------------
 }

@@ -17,10 +17,10 @@ import org.greatlogic.gxtexamples.client.glgwt.GLGridWidget;
 import org.greatlogic.gxtexamples.client.glgwt.GLListStore;
 import org.greatlogic.gxtexamples.client.glgwt.GLSQL;
 import org.greatlogic.gxtexamples.client.glgwt.GLUtil;
-import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLDBOp;
 import org.greatlogic.gxtexamples.client.glgwt.IGLSQLSelectCallback;
 import org.greatlogic.gxtexamples.client.widget.GridWidgetManager;
 import org.greatlogic.gxtexamples.client.widget.MainLayoutWidget;
+import org.greatlogic.gxtexamples.client.widget.PetGridWidget;
 import org.greatlogic.gxtexamples.shared.IDBEnums.EGXTExamplesTable;
 import org.greatlogic.gxtexamples.shared.IDBEnums.Pet;
 import com.google.gwt.core.client.EntryPoint;
@@ -32,11 +32,11 @@ public class GXTExamples implements EntryPoint {
 //--------------------------------------------------------------------------------------------------
 private void loadPets() {
   try {
+    final PetGridWidget gridWidget = GridWidgetManager.getPetGrid("Main");
     final GLSQL petSQL = GLSQL.select();
     petSQL.from(EGXTExamplesTable.Pet);
-    petSQL.whereAnd(Pet.PetId, EGLDBOp.LessThan, 10);
     petSQL.orderBy(EGXTExamplesTable.Pet, Pet.PetName, true);
-    petSQL.execute(new IGLSQLSelectCallback() {
+    petSQL.execute(gridWidget.getListStore(), new IGLSQLSelectCallback() {
       @Override
       public void onFailure(final Throwable t) {
 
@@ -70,7 +70,7 @@ private void login() {
 public void onModuleLoad() {
   GLUtil.initialize();
   final MainLayoutWidget mainLayoutWidget = new MainLayoutWidget();
-  final boolean loadTestData = true;
+  final boolean loadTestData = false;
   final GLGridWidget gridWidget = GridWidgetManager.getPetGrid("Main");
   if (loadTestData) {
     final GLListStore petTypeListStore = new GLListStore();
