@@ -18,6 +18,7 @@ import org.greatlogic.gxtexamples.client.glgwt.GLRecord;
 import org.greatlogic.gxtexamples.client.glgwt.GLRecordDef;
 import org.greatlogic.gxtexamples.client.glgwt.GLUtil;
 import org.greatlogic.gxtexamples.client.glgwt.IGLColumn;
+import org.greatlogic.gxtexamples.shared.IDBEnums.EGXTExamplesTable;
 import org.greatlogic.gxtexamples.shared.IDBEnums.Pet;
 import org.greatlogic.gxtexamples.shared.IDBEnums.PetType;
 
@@ -40,7 +41,7 @@ private static final String[] PetNamesAndSex = new String[] {"Angel,F", "Ashley,
 public static void loadPetTestData(final GLListStore listStore) {
   final IGLColumn[] columns = new IGLColumn[] {Pet.AdoptionFee, Pet.FosterDate, Pet.IntakeDate, //
       Pet.PetId, Pet.PetName, Pet.PetTypeId, Pet.Sex, Pet.TrainedFlag};
-  final GLRecordDef recordDef = new GLRecordDef(columns, Pet.PetId);
+  final GLRecordDef recordDef = new GLRecordDef(EGXTExamplesTable.Pet, columns, Pet.PetId);
   listStore.clear();
   int nextPetId = 1;
   for (final String petNameAndSex : PetNamesAndSex) {
@@ -69,7 +70,8 @@ private static final String[] PetTypes = new String[] {"Cat,Cat", "Dog,Dog"};
 public static void loadPetTypeTestData(final GLListStore listStore) {
   final IGLColumn[] columns = new IGLColumn[] {PetType.PetTypeCode, PetType.PetTypeDesc, //
       PetType.PetTypeId};
-  final GLRecordDef recordDef = new GLRecordDef(columns, PetType.PetTypeId);
+  final GLRecordDef recordDef = new GLRecordDef(EGXTExamplesTable.PetType, columns, //
+                                                PetType.PetTypeId);
   listStore.clear();
   int nextPetTypeId = 1;
   for (final String petType : PetTypes) {

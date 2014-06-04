@@ -1,7 +1,11 @@
 package org.greatlogic.gxtexamples.client.glgwt;
 
+import java.util.List;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
+import com.sencha.gxt.data.shared.event.StoreUpdateEvent;
+import com.sencha.gxt.data.shared.event.StoreUpdateEvent.StoreUpdateHandler;
 /**
  * A ListStore that contains GLRecord entries.
  */
@@ -24,6 +28,67 @@ public GLListStore() {
       return result;
     }
   });
+  createStoreUpdateHandler();
+}
+//--------------------------------------------------------------------------------------------------
+@Override
+public void commitChanges() {
+  for (final Record record : getModifiedRecords()) {
+    final GLRecord glRecord = record.getModel();
+    glRecord.getChangedFieldNameList().clear();
+    for (final Change<GLRecord, ?> change : record.getChanges()) {
+      glRecord.getChangedFieldNameList().add(change.getChangeTag().toString());
+    }
+  }
+  super.commitChanges();
+}
+//--------------------------------------------------------------------------------------------------
+private void createStoreUpdateHandler() {
+  final StoreUpdateHandler<GLRecord> storeUpdateHandler = new StoreUpdateHandler<GLRecord>() {
+    @Override
+    public void onUpdate(final StoreUpdateEvent<GLRecord> event) {
+      final StringBuilder sb = new StringBuilder();
+      final List<GLRecord> updatedRecordList = event.getItems();
+      for (final GLRecord record : updatedRecordList) {
+        sb.append("Table:").append(record.getRecordDef().getTable().toString()).append("/");
+        try {
+          sb.append(record.getKeyValueAsString());
+        }
+        catch (final GLInvalidFieldOrColumnException ifoce) {
+          // the key field doesn't exist
+          sb.append("???");
+        }
+        sb.append(":");
+        boolean firstField = true;
+        for (final String fieldName : record.getChangedFieldNameList()) {
+          sb.append(firstField ? "" : ";").append(fieldName).append("='");
+          try {
+            sb.append(record.asString(fieldName));
+          }
+          catch (final GLInvalidFieldOrColumnException ifoce) {
+            // the column doesn't exist
+          }
+          sb.append("'");
+          firstField = false;
+        }
+        sb.append("\n");
+        record.getChangedFieldNameList().clear();
+      }
+      if (sb.length() > 0) {
+        GLUtil.getRemoteService().update(sb.toString(), new AsyncCallback<Void>() {
+          @Override
+          public void onFailure(final Throwable caught) {
+
+          }
+          @Override
+          public void onSuccess(final Void result) {
+
+          }
+        });
+      }
+    }
+  };
+  addStoreUpdateHandler(storeUpdateHandler);
 }
 //--------------------------------------------------------------------------------------------------
 }

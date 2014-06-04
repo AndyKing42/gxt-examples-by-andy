@@ -9,5 +9,6 @@ public interface IRemoteService extends RemoteService {
 void log(final int logLevel, final String location, final String message);
 Integer login(final String loginName, final String password);
 String select(String selectResult);
+void update(String updates);
 //--------------------------------------------------------------------------------------------------
 }

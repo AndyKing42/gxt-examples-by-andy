@@ -333,8 +333,7 @@ public void execute(final GLListStore listStore, final IGLSQLSelectCallback call
         boolean firstRow = true;
         for (final String row : selectRows) {
           if (firstRow) {
-            recordDef = new GLRecordDef(row.split(","), _keyColumn);
-            GLUtil.info(10, recordDef.toString());
+            recordDef = new GLRecordDef(_table, row.split(","), _keyColumn);
             firstRow = false;
           }
           else {

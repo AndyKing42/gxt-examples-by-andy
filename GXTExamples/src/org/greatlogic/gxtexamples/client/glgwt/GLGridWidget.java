@@ -42,8 +42,6 @@ import com.sencha.gxt.widget.core.client.event.ColumnWidthChangeEvent;
 import com.sencha.gxt.widget.core.client.event.ColumnWidthChangeEvent.ColumnWidthChangeHandler;
 import com.sencha.gxt.widget.core.client.event.HeaderContextMenuEvent;
 import com.sencha.gxt.widget.core.client.event.HeaderContextMenuEvent.HeaderContextMenuHandler;
-import com.sencha.gxt.widget.core.client.event.HeaderDoubleClickEvent;
-import com.sencha.gxt.widget.core.client.event.HeaderDoubleClickEvent.HeaderDoubleClickHandler;
 import com.sencha.gxt.widget.core.client.event.RefreshEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
@@ -114,18 +112,6 @@ private void addHeaderContextMenuHandler() {
     }
   };
   _grid.addHeaderContextMenuHandler(headerContextMenuHandler);
-}
-//--------------------------------------------------------------------------------------------------
-private void addHeaderDoubleClickHandler() {
-  final HeaderDoubleClickHandler headerDoubleClickHandler = new HeaderDoubleClickHandler() {
-    @Override
-    public void onHeaderDoubleClick(final HeaderDoubleClickEvent event) {
-      GLUtil.info(10, "Double click");
-      resizeColumnToFit(event.getColumnIndex());
-      _grid.getView().refresh(true);
-    }
-  };
-  _grid.addHeaderDoubleClickHandler(headerDoubleClickHandler);
 }
 //--------------------------------------------------------------------------------------------------
 @Override
@@ -338,7 +324,6 @@ private void createGrid() {
   _grid.setSelectionModel(_selectionModel);
   _grid.setView(createGridView());
   addHeaderContextMenuHandler();
-  addHeaderDoubleClickHandler();
   createEditors();
 }
 //--------------------------------------------------------------------------------------------------
@@ -384,7 +369,7 @@ private void resizeColumnToFit(final int columnIndex) {
   }
   for (final Store<GLRecord>.Record record : _listStore.getModifiedRecords()) {
     final int width = textMetrics.getWidth(record.getValue(columnConfig.getValueProvider()) //
-    .toString());
+                                                 .toString());
     maxWidth = width > maxWidth ? width : maxWidth;
   }
   columnConfig.setWidth(maxWidth);

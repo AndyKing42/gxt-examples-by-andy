@@ -2,14 +2,16 @@ package org.greatlogic.gxtexamples.client.glgwt;
 
 import java.util.TreeMap;
 /**
- * Provides a mapping of field names to
+ * Provides a mapping of field names to field indexes.
  */
 public class GLRecordDef {
 //--------------------------------------------------------------------------------------------------
 private final TreeMap<String, Integer> _fieldIndexByFieldNameMap; // field name -> field index
 private final String                   _keyFieldName;
+private final IGLTable                 _table;
 //--------------------------------------------------------------------------------------------------
-public GLRecordDef(final Object[] fieldNames, final Object keyFieldName) {
+public GLRecordDef(final IGLTable table, final Object[] fieldNames, final Object keyFieldName) {
+  _table = table;
   _fieldIndexByFieldNameMap = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
   for (int fieldNameIndex = 0; fieldNameIndex < fieldNames.length; ++fieldNameIndex) {
     _fieldIndexByFieldNameMap.put(fieldNames[fieldNameIndex].toString(), fieldNameIndex);
@@ -29,12 +31,20 @@ public int getFieldIndex(final String fieldName) throws GLInvalidFieldOrColumnEx
   return result;
 }
 //--------------------------------------------------------------------------------------------------
+public TreeMap<String, Integer> getFieldIndexByFieldNameMap() {
+  return _fieldIndexByFieldNameMap;
+}
+//--------------------------------------------------------------------------------------------------
 public String getKeyFieldName() {
   return _keyFieldName;
 }
 //--------------------------------------------------------------------------------------------------
 public int getNumberOfFields() {
   return _fieldIndexByFieldNameMap.size();
+}
+//--------------------------------------------------------------------------------------------------
+public IGLTable getTable() {
+  return _table;
 }
 //--------------------------------------------------------------------------------------------------
 @Override

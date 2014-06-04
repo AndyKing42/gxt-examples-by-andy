@@ -2,12 +2,14 @@ package org.greatlogic.gxtexamples.client.glgwt;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 /**
  * A thin wrapper around a list of field values. The objective is to provide easy access to the
  * values in the list, converting the string values to any of a number of basic data types.
  */
 public class GLRecord {
 //--------------------------------------------------------------------------------------------------
+private ArrayList<String>       _changedFieldNameList;
 private final GLRecordDef       _recordDef;
 private final ArrayList<Object> _valueList;
 //--------------------------------------------------------------------------------------------------
@@ -177,6 +179,13 @@ public String asString(final String fieldName, final String defaultValue)
                                     defaultValue);
 }
 //--------------------------------------------------------------------------------------------------
+public ArrayList<String> getChangedFieldNameList() {
+  if (_changedFieldNameList == null) {
+    _changedFieldNameList = new ArrayList<String>();
+  }
+  return _changedFieldNameList;
+}
+//--------------------------------------------------------------------------------------------------
 public String getKeyValueAsString() throws GLInvalidFieldOrColumnException {
   return asString(_recordDef.getKeyFieldName());
 }
@@ -187,9 +196,31 @@ public Object put(final String fieldName, final Object value)
   return _valueList.set(fieldIndex, value);
 }
 //--------------------------------------------------------------------------------------------------
+public GLRecordDef getRecordDef() {
+  return _recordDef;
+}
+//--------------------------------------------------------------------------------------------------
 public Object put(final IGLColumn column, final Object value)
   throws GLInvalidFieldOrColumnException {
   return put(column.toString(), value);
+}
+//--------------------------------------------------------------------------------------------------
+@Override
+public String toString() {
+  final StringBuilder sb = new StringBuilder(_valueList.size() * 20);
+  try {
+    boolean firstTime = true;
+    for (final Entry<String, Integer> fieldEntry : _recordDef.getFieldIndexByFieldNameMap()
+                                                             .entrySet()) {
+      final String fieldName = fieldEntry.getKey();
+      sb.append(firstTime ? "" : ";").append(fieldName).append(":").append(asString(fieldName));
+      firstTime = false;
+    }
+  }
+  catch (final GLInvalidFieldOrColumnException ifoce) {
+    // this should never happen
+  }
+  return sb.toString();
 }
 //--------------------------------------------------------------------------------------------------
 }
