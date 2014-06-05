@@ -1,5 +1,6 @@
 package org.greatlogic.gxtexamples.client.glgwt;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sencha.gxt.data.shared.ListStore;
@@ -61,14 +62,14 @@ private void createStoreUpdateHandler() {
         sb.append(":");
         boolean firstField = true;
         for (final String fieldName : record.getChangedFieldNameList()) {
-          sb.append(firstField ? "" : ";").append(fieldName).append("='");
+          sb.append(firstField ? "" : ";").append(fieldName).append("=");
           try {
             sb.append(record.asString(fieldName));
           }
           catch (final GLInvalidFieldOrColumnException ifoce) {
-            // the column doesn't exist
+            GLUtil.info(5, "Unknown column name:" + fieldName);
           }
-          sb.append("'");
+          sb.append("");
           firstField = false;
         }
         sb.append("\n");
@@ -77,8 +78,8 @@ private void createStoreUpdateHandler() {
       if (sb.length() > 0) {
         GLUtil.getRemoteService().update(sb.toString(), new AsyncCallback<Void>() {
           @Override
-          public void onFailure(final Throwable caught) {
-
+          public void onFailure(final Throwable t) {
+            GLUtil.info(10, "Server update failed:" + t.getMessage());
           }
           @Override
           public void onSuccess(final Void result) {
@@ -89,6 +90,42 @@ private void createStoreUpdateHandler() {
     }
   };
   addStoreUpdateHandler(storeUpdateHandler);
+}
+//--------------------------------------------------------------------------------------------------
+public void remove(final ArrayList<GLRecord> recordList) {
+  for (final GLRecord record : recordList) {
+    remove(record);
+  }
+  final StringBuilder sb = new StringBuilder();
+  boolean firstRecord = true;
+  for (final GLRecord record : recordList) {
+    if (firstRecord) {
+      sb.append("Table:").append(record.getRecordDef().getTable().toString()).append("/");
+      firstRecord = false;
+    }
+    else {
+      sb.append(",");
+    }
+    try {
+      sb.append(record.getKeyValueAsString());
+    }
+    catch (final GLInvalidFieldOrColumnException ifoce) {
+      // the key field doesn't exist
+      sb.append("???");
+    }
+  }
+  if (sb.length() > 0) {
+    GLUtil.getRemoteService().delete(sb.toString(), new AsyncCallback<Void>() {
+      @Override
+      public void onFailure(final Throwable t) {
+        GLUtil.info(10, "Server update failed:" + t.getMessage());
+      }
+      @Override
+      public void onSuccess(final Void result) {
+        GLUtil.info(10, "Changes have been saved on the server");
+      }
+    });
+  }
 }
 //--------------------------------------------------------------------------------------------------
 }

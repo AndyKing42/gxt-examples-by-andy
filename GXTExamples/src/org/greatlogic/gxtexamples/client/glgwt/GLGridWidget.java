@@ -15,6 +15,7 @@ package org.greatlogic.gxtexamples.client.glgwt;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.TreeMap;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLBigDecimalValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLBooleanValueProvider;
@@ -36,10 +37,15 @@ import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.core.client.util.TextMetrics;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.widget.core.client.ContentPanel;
+import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
+import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
+import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer.BoxLayoutPack;
 import com.sencha.gxt.widget.core.client.event.ColumnWidthChangeEvent;
 import com.sencha.gxt.widget.core.client.event.ColumnWidthChangeEvent.ColumnWidthChangeHandler;
+import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
+import com.sencha.gxt.widget.core.client.event.DialogHideEvent.DialogHideHandler;
 import com.sencha.gxt.widget.core.client.event.HeaderContextMenuEvent;
 import com.sencha.gxt.widget.core.client.event.HeaderContextMenuEvent.HeaderContextMenuHandler;
 import com.sencha.gxt.widget.core.client.event.RefreshEvent;
@@ -271,6 +277,47 @@ private void createContentPanel(final String headingText) {
       _listStore.commitChanges();
     }
   }));
+  _contentPanel.addButton(createContentPanelDeleteButton());
+  createContentPanelDeleteButton();
+}
+//--------------------------------------------------------------------------------------------------
+private TextButton createContentPanelDeleteButton() {
+  return new TextButton("Delete Selected", new SelectHandler() {
+    @Override
+    public void onSelect(final SelectEvent selectEvent) {
+      final List<GLRecord> selectedRecordList = _selectionModel.getSelectedItems();
+      if (selectedRecordList.size() == 0) {
+        final AlertMessageBox messageBox;
+        messageBox = new AlertMessageBox("Delete Rows", "You haven't selected any rows to delete");
+        messageBox.show();
+        return;
+      }
+      final String rowMessage;
+      if (selectedRecordList.size() == 1) {
+        rowMessage = "this row";
+      }
+      else {
+        rowMessage = "these " + selectedRecordList.size() + " rows";
+      }
+      final ConfirmMessageBox messageBox;
+      messageBox = new ConfirmMessageBox("Delete Rows", //
+                                         "Are you sure you want to delete " + rowMessage + "?");
+      messageBox.addDialogHideHandler(new DialogHideHandler() {
+        @Override
+        public void onDialogHide(final DialogHideEvent hideEvent) {
+          if (hideEvent.getHideButton() == PredefinedButton.YES) {
+            final ArrayList<GLRecord> recordList;
+            recordList = new ArrayList<GLRecord>(selectedRecordList.size());
+            for (final GLRecord record : selectedRecordList) {
+              recordList.add(record);
+            }
+            _listStore.remove(recordList);
+          }
+        }
+      });
+      messageBox.show();
+    }
+  });
 }
 //--------------------------------------------------------------------------------------------------
 @SuppressWarnings("unchecked")

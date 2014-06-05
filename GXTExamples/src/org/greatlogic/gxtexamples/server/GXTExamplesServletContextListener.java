@@ -4,10 +4,10 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import org.apache.commons.lang3.StringUtils;
 import org.greatlogic.gxtexamples.shared.IDBEnums.EGXTExamplesTable;
-import com.greatlogic.glbase.gldb.GLColumnMetaData;
+import com.greatlogic.glbase.gldb.GLColumnMetadata;
 import com.greatlogic.glbase.gldb.GLDBException;
 import com.greatlogic.glbase.gldb.GLDataSource;
-import com.greatlogic.glbase.gldb.GLResultSetMetaData;
+import com.greatlogic.glbase.gldb.GLResultSetMetadata;
 import com.greatlogic.glbase.gllib.GLLog;
 import com.greatlogic.glbase.gllib.GLUtil;
 import com.greatlogic.glbase.gllib.IGLProgram;
@@ -36,11 +36,11 @@ public void contextInitialized(final ServletContextEvent event) {
                            "<args ConfigFilename='" + configFilename + "'/>");
   //-------------------------
   try {
-    final GLResultSetMetaData metaData;
-    metaData = GLDataSource.getDefaultDataSource() //
-                           .getTableMetaData(EGXTExamplesTable.Pet.toString());
-    for (final GLColumnMetaData columnMetaData : metaData.getColumnMetaDataList()) {
-      GLLog.debug(columnMetaData.toString());
+    final GLResultSetMetadata metadata;
+    metadata = GLDataSource.getDefaultDataSource() //
+                           .getTableMetadata(EGXTExamplesTable.Pet.toString());
+    for (final GLColumnMetadata columnMetadata : metadata.getColumnMetadataList()) {
+      GLLog.debug(columnMetadata.toString());
     }
   }
   catch (final GLDBException dbe) {

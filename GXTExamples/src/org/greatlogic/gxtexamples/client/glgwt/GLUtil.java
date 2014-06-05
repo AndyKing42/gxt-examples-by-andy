@@ -102,6 +102,9 @@ public static String formatObjectSpecial(final Object value, final String defaul
   else if (value instanceof String) {
     result = (String)value;
   }
+  else if (value instanceof Boolean) {
+    result = (Boolean)value ? "Y" : "N";
+  }
   else if (value instanceof java.util.Date) {
     result = GLUtil.formatDateYYYYMMDDHHMMSS(value);
   }

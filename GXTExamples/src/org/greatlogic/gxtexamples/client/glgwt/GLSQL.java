@@ -337,6 +337,7 @@ public void execute(final GLListStore listStore, final IGLSQLSelectCallback call
             firstRow = false;
           }
           else {
+            @SuppressWarnings({"unchecked", "rawtypes"})
             final GLRecord record = new GLRecord(recordDef, (ArrayList)GLCSV.extract(row));
             listStore.add(record);
           }
