@@ -82,7 +82,7 @@ private void createStoreUpdateHandler() {
           }
           @Override
           public void onSuccess(final Void result) {
-
+            GLUtil.info(10, "Changes have been saved on the server");
           }
         });
       }

@@ -89,14 +89,14 @@ public void update(final String updates) {
           colonIndex = row.indexOf(':', slashIndex);
           if (colonIndex > slashIndex + 1 && colonIndex < row.length() - 1) {
             final String keyValue = row.substring(slashIndex + 1, colonIndex);
-            final String[] columnsAndValues = row.substring(colonIndex + 1).split(";");
+            final String[] columnNamesAndValues = row.substring(colonIndex + 1).split(";");
             final GLSQL updateSQL = GLSQL.update(table.toString());
-            for (final String columnAndValue : columnsAndValues) {
-              final int equalsIndex = columnAndValue.indexOf('=');
+            for (final String columnNameAndValue : columnNamesAndValues) {
+              final int equalsIndex = columnNameAndValue.indexOf('=');
               if (equalsIndex > 0) {
-                final String columnName = columnAndValue.substring(0, equalsIndex);
-                final String value = columnAndValue.substring(equalsIndex + 1);
-                //                updateSQL.setValue(columnName, value.isEmpty() ? null : value);
+                final String columnName = columnNameAndValue.substring(0, equalsIndex);
+                final String value = columnNameAndValue.substring(equalsIndex + 1);
+                updateSQL.setValue(columnName, value.isEmpty() ? null : value);
               }
             }
             updateSQL.whereAnd(0, table.getPrimaryKeyColumn().toString() + EGLDBOp.Equals +
