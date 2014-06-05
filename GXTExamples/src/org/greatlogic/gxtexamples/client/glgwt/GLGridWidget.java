@@ -15,10 +15,12 @@ package org.greatlogic.gxtexamples.client.glgwt;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLBigDecimalValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLBooleanValueProvider;
+import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLDateValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLIntegerValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLStringValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLColumnDataType;
@@ -32,6 +34,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.NumberCell;
 import com.sencha.gxt.cell.core.client.form.CheckBoxCell;
+import com.sencha.gxt.cell.core.client.form.DateCell;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.core.client.util.TextMetrics;
@@ -53,6 +56,7 @@ import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.form.BigDecimalField;
+import com.sencha.gxt.widget.core.client.form.DateField;
 import com.sencha.gxt.widget.core.client.form.IntegerField;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.CheckBoxSelectionModel;
@@ -178,6 +182,17 @@ private ColumnConfig<GLRecord, BigDecimal> createColumnConfigBigDecimal(final GL
   return result;
 }
 //--------------------------------------------------------------------------------------------------
+private ColumnConfig<GLRecord, Date> createColumnConfigDate(final GLGridColumnDef gridColumnDef,
+                                                            final IGLColumn column) {
+  final ColumnConfig<GLRecord, Date> result;
+  final ValueProvider<GLRecord, Date> valueProvider = new GLDateValueProvider(column);
+  result = new ColumnConfig<GLRecord, Date>(valueProvider, gridColumnDef.getWidth(), //
+                                            column.getTitle());
+  result.setHorizontalAlignment(gridColumnDef.getHorizontalAlignment());
+  result.setCell(new DateCell());
+  return result;
+}
+//--------------------------------------------------------------------------------------------------
 private ColumnConfig<GLRecord, Integer> createColumnConfigInteger(final GLGridColumnDef gridColumnDef,
                                                                   final IGLColumn column) {
   final ColumnConfig<GLRecord, Integer> result;
@@ -218,6 +233,7 @@ private ColumnModel<GLRecord> createColumnModel() {
         columnConfig = createColumnConfigBigDecimal(gridColumnDef, column);
         break;
       case Date:
+        columnConfig = createColumnConfigDate(gridColumnDef, column);
         break;
       case DateTime:
         break;
@@ -333,6 +349,7 @@ private void createEditors() {
                               new BigDecimalField());
         break;
       case Date:
+        gridEditing.addEditor((ColumnConfig<GLRecord, Date>)columnConfig, new DateField());
         break;
       case DateTime:
         break;

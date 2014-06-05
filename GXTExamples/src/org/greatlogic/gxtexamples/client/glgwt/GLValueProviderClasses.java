@@ -14,6 +14,7 @@ package org.greatlogic.gxtexamples.client.glgwt;
  */
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Date;
 import com.sencha.gxt.core.client.ValueProvider;
 
 abstract class GLValueProviderClasses {
@@ -65,6 +66,38 @@ public Boolean getValue(final GLRecord record) {
 }
 @Override
 public void setValue(final GLRecord record, final Boolean value) {
+  try {
+    record.put(_column, value);
+  }
+  catch (final GLInvalidFieldOrColumnException ifoce) {
+    //
+  }
+}
+@Override
+public String getPath() {
+  return _column.toString();
+}
+}
+//==================================================================================================
+public static class GLDateValueProvider implements ValueProvider<GLRecord, Date> {
+private final IGLColumn _column;
+public GLDateValueProvider(final IGLColumn column) {
+  _column = column;
+}
+@Override
+public Date getValue(final GLRecord record) {
+  Date result;
+  try {
+    result = new Date(2014, 2, 14);
+    final String d = record.asString(_column);
+    return result;
+  }
+  catch (final GLInvalidFieldOrColumnException ifoce) {
+    return null;
+  }
+}
+@Override
+public void setValue(final GLRecord record, final Date value) {
   try {
     record.put(_column, value);
   }
