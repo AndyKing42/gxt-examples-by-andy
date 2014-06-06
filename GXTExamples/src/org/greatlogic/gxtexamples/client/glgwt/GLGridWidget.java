@@ -240,6 +240,18 @@ private ColumnModel<GLRecord> createColumnModel() {
         columnConfig = createColumnConfigDate(gridColumnDef, column);
         break;
       case DateTime:
+        /*
+         * In 3, I'd probably start by making an Editor instance with two sub-editors, one DateField
+         * and one TimeField, each using @Path("") to have them bind to the same value.
+         * 
+         * Or make the new class implement IsField, and use setValue() and getValue() to modify/read
+         * both sub-editors.
+         * 
+         * IsField is what is being used in 3 to replace most MultiField cases - it allows a widget
+         * to supply methods that are helpful for most fields, and as it extends LeafValueEditor, it
+         * can be used in GWT Editor framework, and subfields will be ignored, leaving the dev to
+         * write their own logic for binding the values.
+         */
         break;
       case Decimal:
         columnConfig = createColumnConfigBigDecimal(gridColumnDef, column);
@@ -360,6 +372,18 @@ private void createEditors() {
         gridEditing.addEditor((ColumnConfig<GLRecord, Date>)columnConfig, dateField);
         break;
       case DateTime:
+        /*
+         * In 3, I'd probably start by making an Editor instance with two sub-editors, one DateField
+         * and one TimeField, each using @Path("") to have them bind to the same value.
+         * 
+         * Or make the new class implement IsField, and use setValue() and getValue() to modify/read
+         * both sub-editors.
+         * 
+         * IsField is what is being used in 3 to replace most MultiField cases - it allows a widget
+         * to supply methods that are helpful for most fields, and as it extends LeafValueEditor, it
+         * can be used in GWT Editor framework, and subfields will be ignored, leaving the dev to
+         * write their own logic for binding the values.
+         */
         break;
       case Decimal:
         gridEditing.addEditor((ColumnConfig<GLRecord, BigDecimal>)columnConfig,
