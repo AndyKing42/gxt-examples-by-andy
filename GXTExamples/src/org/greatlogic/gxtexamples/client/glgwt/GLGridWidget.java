@@ -24,9 +24,12 @@ import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLDateValu
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLIntegerValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLStringValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLColumnDataType;
+import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safecss.shared.SafeStyles;
 import com.google.gwt.safecss.shared.SafeStylesUtils;
@@ -34,7 +37,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.NumberCell;
 import com.sencha.gxt.cell.core.client.form.CheckBoxCell;
-import com.sencha.gxt.cell.core.client.form.DateCell;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.core.client.util.TextMetrics;
@@ -57,6 +59,7 @@ import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.form.BigDecimalField;
 import com.sencha.gxt.widget.core.client.form.DateField;
+import com.sencha.gxt.widget.core.client.form.DateTimePropertyEditor;
 import com.sencha.gxt.widget.core.client.form.IntegerField;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.CheckBoxSelectionModel;
@@ -189,7 +192,8 @@ private ColumnConfig<GLRecord, Date> createColumnConfigDate(final GLGridColumnDe
   result = new ColumnConfig<GLRecord, Date>(valueProvider, gridColumnDef.getWidth(), //
                                             column.getTitle());
   result.setHorizontalAlignment(gridColumnDef.getHorizontalAlignment());
-  result.setCell(new DateCell());
+  final DateCell dateCell = new DateCell(DateTimeFormat.getFormat("yyyy MMM dd"));
+  result.setCell(dateCell);
   return result;
 }
 //--------------------------------------------------------------------------------------------------
@@ -349,7 +353,11 @@ private void createEditors() {
                               new BigDecimalField());
         break;
       case Date:
-        gridEditing.addEditor((ColumnConfig<GLRecord, Date>)columnConfig, new DateField());
+        final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_SHORT);
+        final DateTimePropertyEditor propertyEditor = new DateTimePropertyEditor(dateTimeFormat);
+        final DateField dateField = new DateField(propertyEditor);
+        dateField.setClearValueOnParseError(false);
+        gridEditing.addEditor((ColumnConfig<GLRecord, Date>)columnConfig, dateField);
         break;
       case DateTime:
         break;
