@@ -15,6 +15,7 @@ package org.greatlogic.gxtexamples.client.glgwt;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.sencha.gxt.core.client.ValueProvider;
 
 abstract class GLValueProviderClasses {
@@ -84,13 +85,18 @@ private final IGLColumn _column;
 public GLDateValueProvider(final IGLColumn column) {
   _column = column;
 }
+@SuppressWarnings("deprecation")
 @Override
 public Date getValue(final GLRecord record) {
-  Date result;
   try {
-    result = new Date(2014, 2, 14);
-    final String d = record.asString(_column);
-    return result;
+    final String date = record.asString(_column);
+    if (date.length() < 8) {
+      return null;
+    }
+    final int year = GLUtil.stringToInt(date.substring(0, 4));
+    final int month = GLUtil.stringToInt(date.substring(4, 6));
+    final int day = GLUtil.stringToInt(date.substring(6, 8));
+    return new Date(year - 1900, month - 1, day);
   }
   catch (final GLInvalidFieldOrColumnException ifoce) {
     return null;
@@ -99,7 +105,7 @@ public Date getValue(final GLRecord record) {
 @Override
 public void setValue(final GLRecord record, final Date value) {
   try {
-    record.put(_column, value);
+    record.put(_column, DateTimeFormat.getFormat("yyyyMMdd").format(value));
   }
   catch (final GLInvalidFieldOrColumnException ifoce) {
     //

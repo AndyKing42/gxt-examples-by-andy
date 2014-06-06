@@ -26,8 +26,13 @@ import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLStringVa
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLColumnDataType;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -41,12 +46,15 @@ import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.core.client.util.TextMetrics;
 import com.sencha.gxt.data.shared.Store;
+import com.sencha.gxt.widget.core.client.Component;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer.BoxLayoutPack;
+import com.sencha.gxt.widget.core.client.event.BlurEvent;
+import com.sencha.gxt.widget.core.client.event.BlurEvent.BlurHandler;
 import com.sencha.gxt.widget.core.client.event.ColumnWidthChangeEvent;
 import com.sencha.gxt.widget.core.client.event.ColumnWidthChangeEvent.ColumnWidthChangeHandler;
 import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
@@ -57,10 +65,13 @@ import com.sencha.gxt.widget.core.client.event.RefreshEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.sencha.gxt.widget.core.client.event.ValidEvent;
+import com.sencha.gxt.widget.core.client.event.ValidEvent.ValidHandler;
 import com.sencha.gxt.widget.core.client.form.BigDecimalField;
 import com.sencha.gxt.widget.core.client.form.DateField;
 import com.sencha.gxt.widget.core.client.form.DateTimePropertyEditor;
 import com.sencha.gxt.widget.core.client.form.IntegerField;
+import com.sencha.gxt.widget.core.client.form.IsField;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.CheckBoxSelectionModel;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
@@ -185,14 +196,15 @@ private ColumnConfig<GLRecord, BigDecimal> createColumnConfigBigDecimal(final GL
   return result;
 }
 //--------------------------------------------------------------------------------------------------
-private ColumnConfig<GLRecord, Date> createColumnConfigDate(final GLGridColumnDef gridColumnDef,
-                                                            final IGLColumn column) {
+private ColumnConfig<GLRecord, Date> createColumnConfigDateTime(final GLGridColumnDef gridColumnDef,
+                                                                final IGLColumn column,
+                                                                final String dateTimeFormat) {
   final ColumnConfig<GLRecord, Date> result;
   final ValueProvider<GLRecord, Date> valueProvider = new GLDateValueProvider(column);
   result = new ColumnConfig<GLRecord, Date>(valueProvider, gridColumnDef.getWidth(), //
                                             column.getTitle());
   result.setHorizontalAlignment(gridColumnDef.getHorizontalAlignment());
-  final DateCell dateCell = new DateCell(DateTimeFormat.getFormat("yyyy MMM dd"));
+  final DateCell dateCell = new DateCell(DateTimeFormat.getFormat(dateTimeFormat));
   result.setCell(dateCell);
   return result;
 }
@@ -237,21 +249,10 @@ private ColumnModel<GLRecord> createColumnModel() {
         columnConfig = createColumnConfigBigDecimal(gridColumnDef, column);
         break;
       case Date:
-        columnConfig = createColumnConfigDate(gridColumnDef, column);
+        columnConfig = createColumnConfigDateTime(gridColumnDef, column, "dd MMM yyyy");
         break;
       case DateTime:
-        /*
-         * In 3, I'd probably start by making an Editor instance with two sub-editors, one DateField
-         * and one TimeField, each using @Path("") to have them bind to the same value.
-         * 
-         * Or make the new class implement IsField, and use setValue() and getValue() to modify/read
-         * both sub-editors.
-         * 
-         * IsField is what is being used in 3 to replace most MultiField cases - it allows a widget
-         * to supply methods that are helpful for most fields, and as it extends LeafValueEditor, it
-         * can be used in GWT Editor framework, and subfields will be ignored, leaving the dev to
-         * write their own logic for binding the values.
-         */
+        columnConfig = createColumnConfigDateTime(gridColumnDef, column, "dd MMM yyyy hh:mm a");
         break;
       case Decimal:
         columnConfig = createColumnConfigBigDecimal(gridColumnDef, column);
@@ -364,14 +365,72 @@ private void createEditors() {
         gridEditing.addEditor((ColumnConfig<GLRecord, BigDecimal>)columnConfig,
                               new BigDecimalField());
         break;
-      case Date:
-        final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_SHORT);
+      case Date: {
+        final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("MM/dd/yyyy");
         final DateTimePropertyEditor propertyEditor = new DateTimePropertyEditor(dateTimeFormat);
         final DateField dateField = new DateField(propertyEditor);
         dateField.setClearValueOnParseError(false);
+        //-------------------------------
+
+        dateField.addValueChangeHandler(new ValueChangeHandler<Date>() {
+          @Override
+          public void onValueChange(final ValueChangeEvent<Date> event) {
+            final DateField dateFieldSource = (DateField)event.getSource();
+            //            dateFieldSource.setValue(new Date(1965 - 1900, 4, 18));
+            //            dateFieldSource.getCell().setValue(null, null, new Date(1965 - 1900, 4, 9));
+          }
+        });
+
+        dateField.addValidHandler(new ValidHandler() {
+          @Override
+          public void onValid(final ValidEvent event) {
+            final DateField dateFieldSource = (DateField)event.getSource();
+            //            dateFieldSource.setValue(new Date(1965 - 1900, 4, 18));
+          }
+        });
+
+        dateField.addKeyUpHandler(new KeyUpHandler() {
+          @Override
+          public void onKeyUp(final KeyUpEvent event) {
+            final DateField source = (DateField)event.getSource();
+            if (source != null) {
+              GLUtil.info(10, source.getText());
+            }
+          }
+        });
+
+        dateField.addBlurHandler(new BlurHandler() {
+          @Override
+          public void onBlur(final BlurEvent event) {
+            final Component source = event.getSource();
+            if (source == null) {
+              GLUtil.info(10, "?");
+            }
+          }
+        });
+        dateField.addHandler(new ValueChangeHandler() {
+          @Override
+          public void onValueChange(final ValueChangeEvent event) {
+            GLUtil.info(10, event.getValue().toString());
+          }
+        }, ValueChangeEvent.getType());
+        dateField.addHandler(new AttachEvent.Handler() {
+          @Override
+          public void onAttachOrDetach(final AttachEvent event) {
+            // TODO Auto-generated method stub
+
+          }
+        }, AttachEvent.getType());
+
+        //-----------------------------------
         gridEditing.addEditor((ColumnConfig<GLRecord, Date>)columnConfig, dateField);
+        final IsField<Date> editor = gridEditing.getEditor(columnConfig);
+        if (editor == null) {
+          GLUtil.initialize();
+        }
         break;
-      case DateTime:
+      }
+      case DateTime: {
         /*
          * In 3, I'd probably start by making an Editor instance with two sub-editors, one DateField
          * and one TimeField, each using @Path("") to have them bind to the same value.
@@ -384,7 +443,13 @@ private void createEditors() {
          * can be used in GWT Editor framework, and subfields will be ignored, leaving the dev to
          * write their own logic for binding the values.
          */
+        final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_LONG);
+        final DateTimePropertyEditor propertyEditor = new DateTimePropertyEditor(dateTimeFormat);
+        final DateField dateField = new DateField(propertyEditor);
+        dateField.setClearValueOnParseError(false);
+        gridEditing.addEditor((ColumnConfig<GLRecord, Date>)columnConfig, dateField);
         break;
+      }
       case Decimal:
         gridEditing.addEditor((ColumnConfig<GLRecord, BigDecimal>)columnConfig,
                               new BigDecimalField());
