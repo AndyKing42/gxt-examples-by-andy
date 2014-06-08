@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TreeMap;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLBigDecimalValueProvider;
@@ -26,13 +27,8 @@ import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLStringVa
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLColumnDataType;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.TextCell;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -46,15 +42,12 @@ import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.core.client.util.TextMetrics;
 import com.sencha.gxt.data.shared.Store;
-import com.sencha.gxt.widget.core.client.Component;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer.BoxLayoutPack;
-import com.sencha.gxt.widget.core.client.event.BlurEvent;
-import com.sencha.gxt.widget.core.client.event.BlurEvent.BlurHandler;
 import com.sencha.gxt.widget.core.client.event.ColumnWidthChangeEvent;
 import com.sencha.gxt.widget.core.client.event.ColumnWidthChangeEvent.ColumnWidthChangeHandler;
 import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
@@ -65,8 +58,6 @@ import com.sencha.gxt.widget.core.client.event.RefreshEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
-import com.sencha.gxt.widget.core.client.event.ValidEvent;
-import com.sencha.gxt.widget.core.client.event.ValidEvent.ValidHandler;
 import com.sencha.gxt.widget.core.client.form.BigDecimalField;
 import com.sencha.gxt.widget.core.client.form.DateField;
 import com.sencha.gxt.widget.core.client.form.DateTimePropertyEditor;
@@ -86,20 +77,20 @@ import com.sencha.gxt.widget.core.client.menu.MenuItem;
 
 public abstract class GLGridWidget implements IsWidget {
 //--------------------------------------------------------------------------------------------------
-private final ArrayList<ColumnConfig<GLRecord, ?>> _checkBoxList;
-private ContentPanel                               _contentPanel;
-private Grid<GLRecord>                             _grid;
-protected ArrayList<GLGridColumnDef>               _gridColumnDefList;
-private TreeMap<String, GLGridColumnDef>           _gridColumnDefMap;
-protected GLListStore                              _listStore;
-private final String                               _noRowsMessage;
-private GridSelectionModel<GLRecord>               _selectionModel;
+private final HashSet<ColumnConfig<GLRecord, ?>> _checkBoxSet;
+private ContentPanel                             _contentPanel;
+private Grid<GLRecord>                           _grid;
+protected ArrayList<GLGridColumnDef>             _gridColumnDefList;
+private TreeMap<String, GLGridColumnDef>         _gridColumnDefMap;
+protected GLListStore                            _listStore;
+private final String                             _noRowsMessage;
+private GridSelectionModel<GLRecord>             _selectionModel;
 //--------------------------------------------------------------------------------------------------
 protected GLGridWidget(final String headingText, final String noRowsMessage) {
   super();
   _noRowsMessage = noRowsMessage == null ? "There are no results to display" : noRowsMessage;
   _listStore = new GLListStore();
-  _checkBoxList = new ArrayList<ColumnConfig<GLRecord, ?>>();
+  _checkBoxSet = new HashSet<ColumnConfig<GLRecord, ?>>();
   _gridColumnDefList = new ArrayList<GLGridColumnDef>();
   loadGridColumnDefList();
   createGridColumnDefMap();
@@ -173,7 +164,7 @@ private ColumnConfig<GLRecord, Boolean> createColumnConfigBoolean(final GLGridCo
   result.setHorizontalAlignment(gridColumnDef.getHorizontalAlignment());
   result.setCell(new CheckBoxCell());
   result.setSortable(false);
-  _checkBoxList.add(result);
+  _checkBoxSet.add(result);
   return result;
 }
 //--------------------------------------------------------------------------------------------------
@@ -276,13 +267,13 @@ private ColumnModel<GLRecord> createColumnModel() {
     @Override
     public void onColumnWidthChange(final ColumnWidthChangeEvent event) {
       final ColumnConfig<GLRecord, ?> columnConfig = columnConfigList.get(event.getIndex());
-      if (columnConfig.getCell() instanceof CheckBoxCell) {
+      if (_checkBoxSet.contains(columnConfig)) {
         centerCheckBox(columnConfig);
         _grid.getView().refresh(true);
       }
     }
   });
-  for (final ColumnConfig<GLRecord, ?> columnConfig : _checkBoxList) {
+  for (final ColumnConfig<GLRecord, ?> columnConfig : _checkBoxSet) {
     centerCheckBox(columnConfig);
   }
   return result;
@@ -370,59 +361,6 @@ private void createEditors() {
         final DateTimePropertyEditor propertyEditor = new DateTimePropertyEditor(dateTimeFormat);
         final DateField dateField = new DateField(propertyEditor);
         dateField.setClearValueOnParseError(false);
-        //-------------------------------
-
-        dateField.addValueChangeHandler(new ValueChangeHandler<Date>() {
-          @Override
-          public void onValueChange(final ValueChangeEvent<Date> event) {
-            final DateField dateFieldSource = (DateField)event.getSource();
-            //            dateFieldSource.setValue(new Date(1965 - 1900, 4, 18));
-            //            dateFieldSource.getCell().setValue(null, null, new Date(1965 - 1900, 4, 9));
-          }
-        });
-
-        dateField.addValidHandler(new ValidHandler() {
-          @Override
-          public void onValid(final ValidEvent event) {
-            final DateField dateFieldSource = (DateField)event.getSource();
-            //            dateFieldSource.setValue(new Date(1965 - 1900, 4, 18));
-          }
-        });
-
-        dateField.addKeyUpHandler(new KeyUpHandler() {
-          @Override
-          public void onKeyUp(final KeyUpEvent event) {
-            final DateField source = (DateField)event.getSource();
-            if (source != null) {
-              GLUtil.info(10, source.getText());
-            }
-          }
-        });
-
-        dateField.addBlurHandler(new BlurHandler() {
-          @Override
-          public void onBlur(final BlurEvent event) {
-            final Component source = event.getSource();
-            if (source == null) {
-              GLUtil.info(10, "?");
-            }
-          }
-        });
-        dateField.addHandler(new ValueChangeHandler() {
-          @Override
-          public void onValueChange(final ValueChangeEvent event) {
-            GLUtil.info(10, event.getValue().toString());
-          }
-        }, ValueChangeEvent.getType());
-        dateField.addHandler(new AttachEvent.Handler() {
-          @Override
-          public void onAttachOrDetach(final AttachEvent event) {
-            // TODO Auto-generated method stub
-
-          }
-        }, AttachEvent.getType());
-
-        //-----------------------------------
         gridEditing.addEditor((ColumnConfig<GLRecord, Date>)columnConfig, dateField);
         final IsField<Date> editor = gridEditing.getEditor(columnConfig);
         if (editor == null) {
@@ -534,7 +472,7 @@ private void resizeColumnToFit(final int columnIndex) {
     maxWidth = width > maxWidth ? width : maxWidth;
   }
   columnConfig.setWidth(maxWidth);
-  if (columnConfig.getCell() instanceof CheckBoxCell) {
+  if (_checkBoxSet.contains(columnConfig)) {
     centerCheckBox(columnConfig);
   }
 }
