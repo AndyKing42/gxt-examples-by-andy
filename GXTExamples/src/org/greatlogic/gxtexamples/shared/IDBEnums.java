@@ -26,44 +26,41 @@ IntakeDate(EGLColumnDataType.DateTime, 0, "Intake Date/Time", 125),
 NumberOfFosters(EGLColumnDataType.Int, 0, "Number Of Fosters", 20),
 PetId(EGLColumnDataType.Int, 0, "Id", 50),
 PetName(EGLColumnDataType.String, 0, "Pet Name", 80),
-PetTypeId(EGLColumnDataType.Int, 0, "Pet Type", 80, EGXTExamplesTable.PetType, PetType.PetTypeCode),
-Sex(EGLColumnDataType.String, 0, "Sex", 50, new String[] {"F", "M", "U"}),
+PetTypeId(EGLColumnDataType.Int, 0, "Pet Type", 80) {
+@Override
+public IGLColumn getParentDisplayColumn() {
+  return PetType.PetTypeShortDesc;
+}
+@Override
+public EGXTExamplesTable getParentTable() {
+  return EGXTExamplesTable.PetType;
+}
+},
+Sex(EGLColumnDataType.String, 0, "Sex", 50) {
+private String[] _choices;
+@Override
+public String[] getChoices() {
+  if (_choices == null) {
+    _choices = new String[] {"F", "M", "U"};
+  }
+  return _choices;
+}
+},
 TrainedFlag(EGLColumnDataType.Boolean, 0, "Trained?", 80);
-private final String[]          _choices;
 private final EGLColumnDataType _dataType;
 private final int               _defaultGridColumnWidth;
 private final int               _numberOfDecimalPlaces;
-private final IGLColumn         _parentDisplayColumn;
-private final EGXTExamplesTable _parentTable;
 private final String            _title;
 private Pet(final EGLColumnDataType dataType, final int numberOfDecimalPlaces, final String title,
             final int defaultGridColumnWidth) {
-  this(dataType, numberOfDecimalPlaces, title, defaultGridColumnWidth, null, null, null);
-}
-private Pet(final EGLColumnDataType dataType, final int numberOfDecimalPlaces, final String title,
-            final int defaultGridColumnWidth, final String[] choices) {
-  this(dataType, numberOfDecimalPlaces, title, defaultGridColumnWidth, choices, null, null);
-}
-private Pet(final EGLColumnDataType dataType, final int numberOfDecimalPlaces, final String title,
-            final int defaultGridColumnWidth, final EGXTExamplesTable parentTable,
-            final IGLColumn parentDisplayColumn) {
-  this(dataType, numberOfDecimalPlaces, title, defaultGridColumnWidth, null, parentTable,
-       parentDisplayColumn);
-}
-private Pet(final EGLColumnDataType dataType, final int numberOfDecimalPlaces, final String title,
-            final int defaultGridColumnWidth, final String[] choices,
-            final EGXTExamplesTable parentTable, final IGLColumn parentDisplayColumn) {
   _dataType = dataType;
   _numberOfDecimalPlaces = numberOfDecimalPlaces;
   _title = title;
   _defaultGridColumnWidth = defaultGridColumnWidth;
-  _choices = choices;
-  _parentTable = parentTable;
-  _parentDisplayColumn = parentDisplayColumn;
 }
 @Override
 public String[] getChoices() {
-  return _choices;
+  return null;
 }
 @Override
 public EGLColumnDataType getDataType() {
@@ -79,11 +76,11 @@ public int getNumberOfDecimalPlaces() {
 }
 @Override
 public IGLColumn getParentDisplayColumn() {
-  return _parentDisplayColumn;
+  return null;
 }
 @Override
 public EGXTExamplesTable getParentTable() {
-  return _parentTable;
+  return null;
 }
 @Override
 public String getTitle() {
@@ -92,9 +89,9 @@ public String getTitle() {
 }
 //--------------------------------------------------------------------------------------------------
 public enum PetType implements IGLColumn {
-PetTypeCode(EGLColumnDataType.String, 0, "Pet Type Code", 50),
 PetTypeDesc(EGLColumnDataType.String, 0, "Pet Type Desc", 100),
-PetTypeId(EGLColumnDataType.Int, 0, "Id", 50);
+PetTypeId(EGLColumnDataType.Int, 0, "Id", 50),
+PetTypeShortDesc(EGLColumnDataType.String, 0, "Pet Type Short Desc", 10);
 private final EGLColumnDataType _dataType;
 private final int               _defaultGridColumnWidth;
 private final int               _numberOfDecimalPlaces;

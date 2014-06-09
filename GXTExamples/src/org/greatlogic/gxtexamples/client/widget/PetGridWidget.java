@@ -12,36 +12,44 @@ package org.greatlogic.gxtexamples.client.widget;
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+import org.greatlogic.gxtexamples.client.GXTExamplesCache;
+import org.greatlogic.gxtexamples.client.IGXTExamplesEnums.ELookupListKey;
 import org.greatlogic.gxtexamples.client.glgwt.GLGridColumnDef;
 import org.greatlogic.gxtexamples.client.glgwt.GLGridWidget;
 import org.greatlogic.gxtexamples.client.glgwt.GLListStore;
+import org.greatlogic.gxtexamples.client.glgwt.GLRecord;
+import org.greatlogic.gxtexamples.client.glgwt.IGLLookupListStoreKey;
 import org.greatlogic.gxtexamples.shared.IDBEnums.Pet;
 
 public class PetGridWidget extends GLGridWidget {
-//--------------------------------------------------------------------------------------------------
-private GLListStore _petTypeListStore;
 //--------------------------------------------------------------------------------------------------
 public PetGridWidget() {
   super(null, null);
 }
 //--------------------------------------------------------------------------------------------------
 @Override
+public GLListStore getLookupListStore(final IGLLookupListStoreKey lookupListStoreKey) {
+  if (lookupListStoreKey == ELookupListKey.PetTypes) {
+    return GXTExamplesCache.getPetTypeListStore();
+  }
+  return null;
+}
+//--------------------------------------------------------------------------------------------------
+@Override
+public GLRecord getRecordForLookupValue(final IGLLookupListStoreKey lookupListStoreKey,
+                                        final String value) {
+  return GXTExamplesCache.getPetTypeRecordUsingPetTypeShortDesc(value);
+}
+//--------------------------------------------------------------------------------------------------
+@Override
 protected void loadGridColumnDefList() {
   _gridColumnDefList.add(new GLGridColumnDef(Pet.PetName));
-  _gridColumnDefList.add(new GLGridColumnDef(Pet.PetTypeId));
+  _gridColumnDefList.add(new GLGridColumnDef(Pet.PetTypeId, ELookupListKey.PetTypes));
   _gridColumnDefList.add(new GLGridColumnDef(Pet.Sex));
   _gridColumnDefList.add(new GLGridColumnDef(Pet.IntakeDate));
   _gridColumnDefList.add(new GLGridColumnDef(Pet.TrainedFlag));
   _gridColumnDefList.add(new GLGridColumnDef(Pet.AdoptionFee));
   _gridColumnDefList.add(new GLGridColumnDef(Pet.FosterDate));
-}
-//--------------------------------------------------------------------------------------------------
-public GLListStore getPetTypeListStore() {
-  return _petTypeListStore;
-}
-//--------------------------------------------------------------------------------------------------
-public void setPetTypeListStore(final GLListStore petTypeListStore) {
-  _petTypeListStore = petTypeListStore;
 }
 //--------------------------------------------------------------------------------------------------
 }

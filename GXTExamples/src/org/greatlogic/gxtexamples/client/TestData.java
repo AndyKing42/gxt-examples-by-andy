@@ -68,7 +68,7 @@ public static void loadPetTestData(final GLListStore listStore) {
 //--------------------------------------------------------------------------------------------------
 private static final String[] PetTypes = new String[] {"Cat,Cat", "Dog,Dog"};
 public static void loadPetTypeTestData(final GLListStore listStore) {
-  final IGLColumn[] columns = new IGLColumn[] {PetType.PetTypeCode, PetType.PetTypeDesc, //
+  final IGLColumn[] columns = new IGLColumn[] {PetType.PetTypeShortDesc, PetType.PetTypeDesc, //
       PetType.PetTypeId};
   final GLRecordDef recordDef = new GLRecordDef(EGXTExamplesTable.PetType, columns, //
                                                 PetType.PetTypeId);

@@ -26,7 +26,6 @@ import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLForeignK
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLIntegerValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLStringValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLColumnDataType;
-import org.greatlogic.gxtexamples.client.widget.PetGridWidget;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -43,6 +42,8 @@ import com.sencha.gxt.cell.core.client.form.CheckBoxCell;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.core.client.util.TextMetrics;
+import com.sencha.gxt.data.shared.Converter;
+import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
@@ -416,10 +417,7 @@ private void createEditors() {
           gridEditing.addEditor((ColumnConfig<GLRecord, Integer>)columnConfig, new IntegerField());
         }
         else {
-          final GLListStore petTypeListStore = ((PetGridWidget)this).getPetTypeListStore();
-          final ComboBox<GLRecord> comboBox = new ComboBox<GLRecord>(petTypeListStore, //
-                                                                     labelProvider);
-          gridEditing.addEditor((ColumnConfig<GLRecord, Integer>)columnConfig, converter, comboBox);
+          createEditorsForeignKeyCombobox(gridEditing, gridColumnDef);
         }
         break;
       case String:
@@ -427,6 +425,43 @@ private void createEditors() {
         break;
     }
   }
+}
+//--------------------------------------------------------------------------------------------------
+@SuppressWarnings("unchecked")
+private void createEditorsForeignKeyCombobox(final GridEditing<GLRecord> gridEditing,
+                                             final GLGridColumnDef gridColumnDef) {
+  final IGLColumn column = gridColumnDef.getColumn();
+  final IGLLookupListStoreKey lookupListStoreKey = gridColumnDef.getLookupListStoreKey();
+  final GLListStore lookupListStore = getLookupListStore(lookupListStoreKey);
+  if (lookupListStore == null) {
+    GLUtil.info(10, "Lookup list store not found for column:" + column + " key" +
+                    lookupListStoreKey);
+    return;
+  }
+  final LabelProvider<GLRecord> labelProvider = new LabelProvider<GLRecord>() {
+    @Override
+    public String getLabel(final GLRecord record) {
+      try {
+        return record.asString(column.getParentDisplayColumn());
+      }
+      catch (final GLInvalidFieldOrColumnException e) {
+        return "???";
+      }
+    }
+  };
+  final ComboBox<GLRecord> comboBox = new ComboBox<GLRecord>(lookupListStore, labelProvider);
+  final Converter<String, GLRecord> converter = new Converter<String, GLRecord>() {
+    @Override
+    public GLRecord convertModelValue(final String displayValue) {
+      return getRecordForLookupValue(lookupListStoreKey, displayValue);
+    }
+    @Override
+    public String convertFieldValue(final GLRecord record) {
+      return "Cat";
+    }
+  };
+  gridEditing.addEditor((ColumnConfig<GLRecord, String>)gridColumnDef.getColumnConfig(), converter,
+                        comboBox);
 }
 //--------------------------------------------------------------------------------------------------
 private void createGrid() {
@@ -469,6 +504,15 @@ private GridView<GLRecord> createGridView() {
 //--------------------------------------------------------------------------------------------------
 public GLListStore getListStore() {
   return _listStore;
+}
+//--------------------------------------------------------------------------------------------------
+public GLListStore getLookupListStore(final IGLLookupListStoreKey lookupListStoreKey) {
+  return null;
+}
+//--------------------------------------------------------------------------------------------------
+public GLRecord getRecordForLookupValue(final IGLLookupListStoreKey lookupListStoreKey,
+                                        final String value) {
+  return null;
 }
 //--------------------------------------------------------------------------------------------------
 protected abstract void loadGridColumnDefList();
