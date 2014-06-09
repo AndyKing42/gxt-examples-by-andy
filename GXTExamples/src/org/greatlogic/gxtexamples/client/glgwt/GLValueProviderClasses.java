@@ -15,6 +15,7 @@ package org.greatlogic.gxtexamples.client.glgwt;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
+import java.util.TreeMap;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.sencha.gxt.core.client.ValueProvider;
 
@@ -106,6 +107,43 @@ public Date getValue(final GLRecord record) {
 public void setValue(final GLRecord record, final Date value) {
   try {
     record.put(_column, DateTimeFormat.getFormat("yyyyMMdd").format(value));
+  }
+  catch (final GLInvalidFieldOrColumnException ifoce) {
+    //
+  }
+}
+@Override
+public String getPath() {
+  return _column.toString();
+}
+}
+//==================================================================================================
+public static class GLForeignKeyValueProvider implements ValueProvider<GLRecord, String> {
+private final TreeMap<Integer, String> _parentDisplayValueMap;
+private final IGLColumn                _column;
+public GLForeignKeyValueProvider(final IGLColumn column) {
+  _column = column;
+  _parentDisplayValueMap = new TreeMap<Integer, String>();
+  _parentDisplayValueMap.put(1, "Dog");
+  _parentDisplayValueMap.put(2, "Cat");
+  _parentDisplayValueMap.put(3, "Unicorn");
+  _parentDisplayValueMap.put(4, "FSM");
+}
+@Override
+public String getValue(final GLRecord record) {
+  String result;
+  try {
+    result = _parentDisplayValueMap.get(record.asInt(_column));
+    return result;
+  }
+  catch (final GLInvalidFieldOrColumnException ifoce) {
+    return "";
+  }
+}
+@Override
+public void setValue(final GLRecord record, final String value) {
+  try {
+    record.put(_column, value);
   }
   catch (final GLInvalidFieldOrColumnException ifoce) {
     //

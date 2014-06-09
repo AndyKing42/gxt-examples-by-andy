@@ -22,12 +22,15 @@ public GLGridColumnDef(final IGLColumn column, final String header, final int wi
   _column = column;
   _header = header == null ? _column.getTitle() : header;
   _width = width < 0 ? column.getDefaultGridColumnWidth() : width;
-  if (_column.getDataType() == EGLColumnDataType.Boolean) {
+  final EGLColumnDataType dataType = _column.getDataType();
+  if (dataType == EGLColumnDataType.Boolean) {
     _horizontalAlignment = HasHorizontalAlignment.ALIGN_CENTER;
   }
+  else if (dataType.getNumeric() && _column.getParentTable() == null) {
+    _horizontalAlignment = HasHorizontalAlignment.ALIGN_RIGHT;
+  }
   else {
-    _horizontalAlignment = _column.getDataType().getNumeric() ? HasHorizontalAlignment.ALIGN_RIGHT //
-                                                             : HasHorizontalAlignment.ALIGN_LEFT;
+    _horizontalAlignment = HasHorizontalAlignment.ALIGN_LEFT;
   }
 }
 //--------------------------------------------------------------------------------------------------

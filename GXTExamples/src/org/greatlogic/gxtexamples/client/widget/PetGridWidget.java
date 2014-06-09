@@ -14,9 +14,12 @@ package org.greatlogic.gxtexamples.client.widget;
  */
 import org.greatlogic.gxtexamples.client.glgwt.GLGridColumnDef;
 import org.greatlogic.gxtexamples.client.glgwt.GLGridWidget;
+import org.greatlogic.gxtexamples.client.glgwt.GLListStore;
 import org.greatlogic.gxtexamples.shared.IDBEnums.Pet;
 
 public class PetGridWidget extends GLGridWidget {
+//--------------------------------------------------------------------------------------------------
+private GLListStore _petTypeListStore;
 //--------------------------------------------------------------------------------------------------
 public PetGridWidget() {
   super(null, null);
@@ -25,11 +28,20 @@ public PetGridWidget() {
 @Override
 protected void loadGridColumnDefList() {
   _gridColumnDefList.add(new GLGridColumnDef(Pet.PetName));
+  _gridColumnDefList.add(new GLGridColumnDef(Pet.PetTypeId));
   _gridColumnDefList.add(new GLGridColumnDef(Pet.Sex));
   _gridColumnDefList.add(new GLGridColumnDef(Pet.IntakeDate));
   _gridColumnDefList.add(new GLGridColumnDef(Pet.TrainedFlag));
   _gridColumnDefList.add(new GLGridColumnDef(Pet.AdoptionFee));
   _gridColumnDefList.add(new GLGridColumnDef(Pet.FosterDate));
+}
+//--------------------------------------------------------------------------------------------------
+public GLListStore getPetTypeListStore() {
+  return _petTypeListStore;
+}
+//--------------------------------------------------------------------------------------------------
+public void setPetTypeListStore(final GLListStore petTypeListStore) {
+  _petTypeListStore = petTypeListStore;
 }
 //--------------------------------------------------------------------------------------------------
 }

@@ -23,6 +23,7 @@ import org.greatlogic.gxtexamples.client.widget.MainLayoutWidget;
 import org.greatlogic.gxtexamples.client.widget.PetGridWidget;
 import org.greatlogic.gxtexamples.shared.IDBEnums.EGXTExamplesTable;
 import org.greatlogic.gxtexamples.shared.IDBEnums.Pet;
+import org.greatlogic.gxtexamples.shared.IDBEnums.PetType;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -30,20 +31,40 @@ import com.sencha.gxt.widget.core.client.box.MessageBox;
 
 public class GXTExamples implements EntryPoint {
 //--------------------------------------------------------------------------------------------------
-private void loadPets() {
+private void loadPets(final GLListStore petListStore) {
   try {
-    final PetGridWidget gridWidget = GridWidgetManager.getPetGrid("Main");
     final GLSQL petSQL = GLSQL.select();
     petSQL.from(EGXTExamplesTable.Pet);
     petSQL.orderBy(EGXTExamplesTable.Pet, Pet.PetName, true);
-    petSQL.execute(gridWidget.getListStore(), new IGLSQLSelectCallback() {
+    petSQL.execute(petListStore, new IGLSQLSelectCallback() {
       @Override
       public void onFailure(final Throwable t) {
-
+        GLUtil.info(30, "Pet loading failed: " + t.getMessage());
       }
       @Override
       public void onSuccess(final GLListStore listStore) {
+        GLUtil.info(5, "Pets loaded successfully");
+      }
+    });
+  }
+  catch (final GLDBException dbe) {
 
+  }
+}
+//--------------------------------------------------------------------------------------------------
+private void loadPetTypes(final GLListStore petTypeListStore) {
+  try {
+    final GLSQL petTypeSQL = GLSQL.select();
+    petTypeSQL.from(EGXTExamplesTable.PetType);
+    petTypeSQL.orderBy(EGXTExamplesTable.PetType, PetType.PetTypeCode, true);
+    petTypeSQL.execute(petTypeListStore, new IGLSQLSelectCallback() {
+      @Override
+      public void onFailure(final Throwable t) {
+        GLUtil.info(30, "Pet type loading failed: " + t.getMessage());
+      }
+      @Override
+      public void onSuccess(final GLListStore listStore) {
+        GLUtil.info(5, "Pet types loaded successfully");
       }
     });
   }
@@ -71,7 +92,8 @@ public void onModuleLoad() {
   GLUtil.initialize();
   final MainLayoutWidget mainLayoutWidget = new MainLayoutWidget();
   final boolean loadTestData = false;
-  final GLGridWidget gridWidget = GridWidgetManager.getPetGrid("Main");
+  final PetGridWidget petGrid = GridWidgetManager.getPetGrid("Main");
+  final GLGridWidget gridWidget = petGrid;
   if (loadTestData) {
     final GLListStore petTypeListStore = new GLListStore();
     TestData.loadPetTypeTestData(petTypeListStore);
@@ -79,7 +101,10 @@ public void onModuleLoad() {
   }
   mainLayoutWidget.getCenterPanel().setWidget(gridWidget);
   RootPanel.get().add(mainLayoutWidget);
-  loadPets();
+  final GLListStore petTypeListStore = new GLListStore();
+  petGrid.setPetTypeListStore(petTypeListStore);
+  loadPetTypes(petTypeListStore);
+  loadPets(petGrid.getListStore());
 }
 //--------------------------------------------------------------------------------------------------
 }

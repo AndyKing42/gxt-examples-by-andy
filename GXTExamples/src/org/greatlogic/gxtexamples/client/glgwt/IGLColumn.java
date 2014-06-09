@@ -1,6 +1,7 @@
 package org.greatlogic.gxtexamples.client.glgwt;
 
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLColumnDataType;
+import org.greatlogic.gxtexamples.shared.IDBEnums.EGXTExamplesTable;
 /*
  * Copyright 2006-2014 Andy King (GreatLogic.com)
  * 
@@ -20,6 +21,8 @@ public String[] getChoices();
 public EGLColumnDataType getDataType();
 public int getDefaultGridColumnWidth();
 public int getNumberOfDecimalPlaces();
+public IGLColumn getParentDisplayColumn();
+public EGXTExamplesTable getParentTable();
 public String getTitle();
 //--------------------------------------------------------------------------------------------------
 }

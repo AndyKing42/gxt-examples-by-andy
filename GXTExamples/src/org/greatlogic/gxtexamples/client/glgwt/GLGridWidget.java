@@ -22,9 +22,11 @@ import java.util.TreeMap;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLBigDecimalValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLBooleanValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLDateValueProvider;
+import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLForeignKeyValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLIntegerValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLStringValueProvider;
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLColumnDataType;
+import org.greatlogic.gxtexamples.client.widget.PetGridWidget;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -59,6 +61,7 @@ import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.form.BigDecimalField;
+import com.sencha.gxt.widget.core.client.form.ComboBox;
 import com.sencha.gxt.widget.core.client.form.DateField;
 import com.sencha.gxt.widget.core.client.form.DateTimePropertyEditor;
 import com.sencha.gxt.widget.core.client.form.IntegerField;
@@ -200,6 +203,17 @@ private ColumnConfig<GLRecord, Date> createColumnConfigDateTime(final GLGridColu
   return result;
 }
 //--------------------------------------------------------------------------------------------------
+private ColumnConfig<GLRecord, String> createColumnConfigForeignKey(final GLGridColumnDef gridColumnDef,
+                                                                    final IGLColumn column) {
+  final ColumnConfig<GLRecord, String> result;
+  final ValueProvider<GLRecord, String> valueProvider = new GLForeignKeyValueProvider(column);
+  result = new ColumnConfig<GLRecord, String>(valueProvider, gridColumnDef.getWidth(), //
+                                              column.getTitle());
+  result.setHorizontalAlignment(gridColumnDef.getHorizontalAlignment());
+  result.setCell(new TextCell());
+  return result;
+}
+//--------------------------------------------------------------------------------------------------
 private ColumnConfig<GLRecord, Integer> createColumnConfigInteger(final GLGridColumnDef gridColumnDef,
                                                                   final IGLColumn column) {
   final ColumnConfig<GLRecord, Integer> result;
@@ -249,9 +263,12 @@ private ColumnModel<GLRecord> createColumnModel() {
         columnConfig = createColumnConfigBigDecimal(gridColumnDef, column);
         break;
       case Int:
-        columnConfig = createColumnConfigInteger(gridColumnDef, column);
-        break;
-      case Money:
+        if (column.getParentTable() == null) {
+          columnConfig = createColumnConfigInteger(gridColumnDef, column);
+        }
+        else {
+          columnConfig = createColumnConfigForeignKey(gridColumnDef, column);
+        }
         break;
       case String:
         columnConfig = createColumnConfigString(gridColumnDef, column);
@@ -349,8 +366,10 @@ private void createEditors() {
   final GridEditing<GLRecord> gridEditing = new GridInlineEditing<GLRecord>(_grid);
   for (final GLGridColumnDef gridColumnDef : _gridColumnDefList) {
     final ColumnConfig<GLRecord, ?> columnConfig = gridColumnDef.getColumnConfig();
-    switch (gridColumnDef.getColumn().getDataType()) {
+    final IGLColumn column = gridColumnDef.getColumn();
+    switch (column.getDataType()) {
       case Boolean:
+        // no editor is needed - the checkbox can be changed in place
         break;
       case Currency:
         gridEditing.addEditor((ColumnConfig<GLRecord, BigDecimal>)columnConfig,
@@ -393,9 +412,15 @@ private void createEditors() {
                               new BigDecimalField());
         break;
       case Int:
-        gridEditing.addEditor((ColumnConfig<GLRecord, Integer>)columnConfig, new IntegerField());
-        break;
-      case Money:
+        if (column.getParentTable() == null) {
+          gridEditing.addEditor((ColumnConfig<GLRecord, Integer>)columnConfig, new IntegerField());
+        }
+        else {
+          final GLListStore petTypeListStore = ((PetGridWidget)this).getPetTypeListStore();
+          final ComboBox<GLRecord> comboBox = new ComboBox<GLRecord>(petTypeListStore, //
+                                                                     labelProvider);
+          gridEditing.addEditor((ColumnConfig<GLRecord, Integer>)columnConfig, converter, comboBox);
+        }
         break;
       case String:
         gridEditing.addEditor((ColumnConfig<GLRecord, String>)columnConfig, new TextField());

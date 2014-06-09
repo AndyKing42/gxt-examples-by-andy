@@ -21,7 +21,6 @@ Date(false),
 DateTime(false),
 Decimal(true),
 Int(true),
-Money(true),
 String(false);
 private final boolean _numeric;
 private EGLColumnDataType(final boolean numeric) {

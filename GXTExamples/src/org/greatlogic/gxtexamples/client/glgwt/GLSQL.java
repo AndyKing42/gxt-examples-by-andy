@@ -318,6 +318,11 @@ private void ensureSQLTypeIn(final EGLSQLType... sqlTypes) throws GLDBException 
   }
 }
 //--------------------------------------------------------------------------------------------------
+/**
+ * Executes a "select" statement.
+ * @param listStore The ListStore that will receive the results of the "select".
+ * @param callback The object that contains the success and failure callback methods.
+ */
 public void execute(final GLListStore listStore, final IGLSQLSelectCallback callback) {
   GLUtil.getRemoteService().select(toXMLSB().toString(), new AsyncCallback<String>() {
     @Override
