@@ -159,19 +159,6 @@ private void createCheckBoxSelectionModel() {
   };
 }
 //--------------------------------------------------------------------------------------------------
-private ColumnConfig<GLRecord, Boolean> createColumnConfigBoolean(final GLGridColumnDef gridColumnDef,
-                                                                  final IGLColumn column) {
-  final ColumnConfig<GLRecord, Boolean> result;
-  final ValueProvider<GLRecord, Boolean> valueProvider = new GLBooleanValueProvider(column);
-  result = new ColumnConfig<GLRecord, Boolean>(valueProvider, gridColumnDef.getWidth(), //
-                                               column.getTitle());
-  result.setHorizontalAlignment(gridColumnDef.getHorizontalAlignment());
-  result.setCell(new CheckBoxCell());
-  result.setSortable(false);
-  _checkBoxSet.add(result);
-  return result;
-}
-//--------------------------------------------------------------------------------------------------
 private ColumnConfig<GLRecord, BigDecimal> createColumnConfigBigDecimal(final GLGridColumnDef gridColumnDef,
                                                                         final IGLColumn column) {
   final ColumnConfig<GLRecord, BigDecimal> result;
@@ -188,6 +175,19 @@ private ColumnConfig<GLRecord, BigDecimal> createColumnConfigBigDecimal(final GL
     numberFormat = NumberFormat.getDecimalFormat();
   }
   result.setCell(new NumberCell<BigDecimal>(numberFormat));
+  return result;
+}
+//--------------------------------------------------------------------------------------------------
+private ColumnConfig<GLRecord, Boolean> createColumnConfigBoolean(final GLGridColumnDef gridColumnDef,
+                                                                  final IGLColumn column) {
+  final ColumnConfig<GLRecord, Boolean> result;
+  final ValueProvider<GLRecord, Boolean> valueProvider = new GLBooleanValueProvider(column);
+  result = new ColumnConfig<GLRecord, Boolean>(valueProvider, gridColumnDef.getWidth(), //
+                                               column.getTitle());
+  result.setHorizontalAlignment(gridColumnDef.getHorizontalAlignment());
+  result.setCell(new CheckBoxCell());
+  result.setSortable(false);
+  _checkBoxSet.add(result);
   return result;
 }
 //--------------------------------------------------------------------------------------------------
