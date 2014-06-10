@@ -35,6 +35,7 @@ import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safecss.shared.SafeStyles;
 import com.google.gwt.safecss.shared.SafeStylesUtils;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.NumberCell;
@@ -519,26 +520,31 @@ protected abstract void loadGridColumnDefList();
 //--------------------------------------------------------------------------------------------------
 private void resizeColumnToFit(final int columnIndex) {
   final ColumnConfig<GLRecord, ?> columnConfig = _grid.getColumnModel().getColumn(columnIndex);
-  final GLGridColumnDef gridColumnDef = _gridColumnDefMap.get(columnConfig.getPath());
   final TextMetrics textMetrics = TextMetrics.get();
   textMetrics.bind(_grid.getView().getHeader().getAppearance().styles().head());
   int maxWidth = textMetrics.getWidth(columnConfig.getHeader().asString()) + 15; // extra is for the dropdown arrow
   if (_listStore.size() > 0) {
     textMetrics.bind(_grid.getView().getCell(0, 1));
-    final IGLColumn column = gridColumnDef.getColumn();
-    try {
-      for (final GLRecord record : _listStore.getAll()) {
-        int width;
-        width = textMetrics.getWidth(record.asString(column));
+    for (final GLRecord record : _listStore.getAll()) {
+      final Object value = columnConfig.getValueProvider().getValue(record);
+      if (value != null) {
+        String valueAsString;
+        if (columnConfig.getCell() instanceof DateCell) {
+          final DateCell dateCell = (DateCell)columnConfig.getCell();
+          final SafeHtmlBuilder sb = new SafeHtmlBuilder();
+          dateCell.render(null, (Date)value, sb);
+          valueAsString = sb.toSafeHtml().asString();
+        }
+        else {
+          valueAsString = value.toString();
+        }
+        final int width = textMetrics.getWidth(valueAsString) + 12;
         maxWidth = width > maxWidth ? width : maxWidth;
       }
     }
-    catch (final GLInvalidFieldOrColumnException ifoce) {
-      //
-    }
     for (final Store<GLRecord>.Record record : _listStore.getModifiedRecords()) {
       final int width = textMetrics.getWidth(record.getValue(columnConfig.getValueProvider()) //
-                                                   .toString());
+                                                   .toString()) + 12;
       maxWidth = width > maxWidth ? width : maxWidth;
     }
   }
