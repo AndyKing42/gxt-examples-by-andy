@@ -523,22 +523,24 @@ private void resizeColumnToFit(final int columnIndex) {
   final TextMetrics textMetrics = TextMetrics.get();
   textMetrics.bind(_grid.getView().getHeader().getAppearance().styles().head());
   int maxWidth = textMetrics.getWidth(columnConfig.getHeader().asString()) + 15; // extra is for the dropdown arrow
-  textMetrics.bind(_grid.getView().getCell(0, 1));
-  final IGLColumn column = gridColumnDef.getColumn();
-  try {
-    for (final GLRecord record : _listStore.getAll()) {
-      int width;
-      width = textMetrics.getWidth(record.asString(column));
+  if (_listStore.size() > 0) {
+    textMetrics.bind(_grid.getView().getCell(0, 1));
+    final IGLColumn column = gridColumnDef.getColumn();
+    try {
+      for (final GLRecord record : _listStore.getAll()) {
+        int width;
+        width = textMetrics.getWidth(record.asString(column));
+        maxWidth = width > maxWidth ? width : maxWidth;
+      }
+    }
+    catch (final GLInvalidFieldOrColumnException ifoce) {
+      //
+    }
+    for (final Store<GLRecord>.Record record : _listStore.getModifiedRecords()) {
+      final int width = textMetrics.getWidth(record.getValue(columnConfig.getValueProvider()) //
+                                                   .toString());
       maxWidth = width > maxWidth ? width : maxWidth;
     }
-  }
-  catch (final GLInvalidFieldOrColumnException ifoce) {
-    //
-  }
-  for (final Store<GLRecord>.Record record : _listStore.getModifiedRecords()) {
-    final int width = textMetrics.getWidth(record.getValue(columnConfig.getValueProvider()) //
-                                                 .toString());
-    maxWidth = width > maxWidth ? width : maxWidth;
   }
   columnConfig.setWidth(maxWidth);
   if (_checkBoxSet.contains(columnConfig)) {
