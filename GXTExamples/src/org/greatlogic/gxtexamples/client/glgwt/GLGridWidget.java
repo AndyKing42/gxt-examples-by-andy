@@ -28,6 +28,8 @@ import org.greatlogic.gxtexamples.client.glgwt.GLValueProviderClasses.GLStringVa
 import org.greatlogic.gxtexamples.client.glgwt.IGLEnums.EGLColumnDataType;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -50,6 +52,7 @@ import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
+import com.sencha.gxt.widget.core.client.box.ProgressMessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer.BoxLayoutPack;
 import com.sencha.gxt.widget.core.client.event.ColumnWidthChangeEvent;
@@ -121,11 +124,13 @@ private void addHeaderContextMenuHandler() {
       menuItem.addSelectionHandler(new SelectionHandler<Item>() {
         @Override
         public void onSelection(final SelectionEvent<Item> selectionEvent) {
-          final int startIndex = _selectionModel instanceof CheckBoxSelectionModel ? 1 : 0;
-          for (int columnIndex = startIndex; columnIndex < _grid.getColumnModel().getColumnCount(); ++columnIndex) {
-            resizeColumnToFit(columnIndex);
-          }
-          _grid.getView().refresh(true);
+          final ProgressMessageBox messageBox = new ProgressMessageBox("Size All Columns", //
+                                                                       "Resizing Columns...");
+          messageBox.setProgressText("Calculating...");
+          //          messageBox.setPredefinedButtons();
+          messageBox.show();
+          resizeNextColumn(messageBox, _selectionModel instanceof CheckBoxSelectionModel ? 1 : 0,
+                           _grid.getColumnModel().getColumnCount() - 1);
         }
       });
       headerContextMenuEvent.getMenu().add(menuItem);
@@ -552,6 +557,23 @@ private void resizeColumnToFit(final int columnIndex) {
   if (_checkBoxSet.contains(columnConfig)) {
     centerCheckBox(columnConfig);
   }
+}
+//--------------------------------------------------------------------------------------------------
+private void resizeNextColumn(final ProgressMessageBox messageBox, final int columnIndex,
+                              final int lastColumnIndex) {
+  Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+    @Override
+    public void execute() {
+      resizeColumnToFit(columnIndex);
+      if (columnIndex == lastColumnIndex) {
+        messageBox.hide();
+        _grid.getView().refresh(true);
+        return;
+      }
+      messageBox.updateProgress((double)columnIndex / (lastColumnIndex + 1), "{0}% Complete");
+      resizeNextColumn(messageBox, columnIndex + 1, lastColumnIndex);
+    }
+  });
 }
 //--------------------------------------------------------------------------------------------------
 }
