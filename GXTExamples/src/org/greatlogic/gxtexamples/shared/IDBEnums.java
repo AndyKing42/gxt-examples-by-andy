@@ -23,7 +23,7 @@ public enum Pet implements IGLColumn {
 AdoptionFee(EGLColumnDataType.Currency, 2, "Adoption Fee", 100),
 FosterDate(EGLColumnDataType.Date, 0, "Foster Date", 100),
 IntakeDate(EGLColumnDataType.DateTime, 0, "Intake Date/Time", 125),
-NumberOfFosters(EGLColumnDataType.Int, 0, "Number Of Fosters", 20),
+NumberOfFosters(EGLColumnDataType.Int, 0, "Number Of Fosters", 80),
 PetId(EGLColumnDataType.Int, 0, "Id", 50),
 PetName(EGLColumnDataType.String, 0, "Pet Name", 80),
 PetTypeId(EGLColumnDataType.Int, 0, "Pet Type", 80) {
