@@ -1,0 +1,1 @@
+GXT is the Sencha GWT library. This project shows some examples to test implementation approaches.
